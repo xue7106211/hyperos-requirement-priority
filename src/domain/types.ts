@@ -44,6 +44,7 @@ export interface Requirement {
   weightsSnapshot: Weights;
   thresholdsSnapshot: Thresholds;
   evaluatedAt: string;
+  manuallyAdjusted?: boolean;
 }
 
 export interface ValidationResult {

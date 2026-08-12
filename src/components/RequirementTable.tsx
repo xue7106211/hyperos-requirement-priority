@@ -93,7 +93,7 @@ export function RequirementTable({ requirements, onRowClick }: RequirementTableP
                 variant="secondary"
                 className="rounded-sm text-[10px] font-normal"
               >
-                仍为预设
+                {req.manuallyAdjusted ? "已人工调整" : "仍为预设"}
               </Badge>
             </TableCell>
           </TableRow>
