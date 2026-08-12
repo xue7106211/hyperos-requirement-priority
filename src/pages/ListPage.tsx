@@ -88,19 +88,6 @@ export function ListPage({ onEditRequirement }: ListPageProps) {
     [filtered]
   );
 
-  /* ─── 重置为预设(清除 manuallyAdjusted 标记) ─── */
-  const handleReset = useCallback(() => {
-    const all = loadRequirements();
-    const filteredIds = new Set(filtered.map((r) => r.id));
-    const updated = all.map((req) => {
-      if (!filteredIds.has(req.id)) return req;
-      const { manuallyAdjusted: _, ...rest } = req;
-      return rest as Requirement;
-    });
-    saveRequirements(updated);
-    setRefreshKey((k) => k + 1);
-  }, [filtered]);
-
   /* ─── CSV 导出 ─── */
   const handleExport = useCallback(() => {
     const csvText = exportToCsv(filtered);
@@ -192,7 +179,7 @@ export function ListPage({ onEditRequirement }: ListPageProps) {
         availableTags={availableTags}
       />
 
-      <BulkAssignBar onApply={handleBulkApply} onReset={handleReset} />
+      <BulkAssignBar onApply={handleBulkApply} />
 
       <RequirementTable
         requirements={filtered}

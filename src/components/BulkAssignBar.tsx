@@ -13,12 +13,11 @@ import { Button } from "@/components/ui/button";
 
 interface BulkAssignBarProps {
   onApply: (dim: DimensionKey, score: 0 | 1 | 2 | 3 | 4) => void;
-  onReset?: () => void;
 }
 
 const SCORE_OPTIONS: Array<0 | 1 | 2 | 3 | 4> = [0, 1, 2, 3, 4];
 
-export function BulkAssignBar({ onApply, onReset }: BulkAssignBarProps) {
+export function BulkAssignBar({ onApply }: BulkAssignBarProps) {
   const [dimension, setDimension] = useState<DimensionKey>(DIMENSION_KEYS[0]);
   const [score, setScore] = useState<0 | 1 | 2 | 3 | 4>(0);
 
@@ -66,17 +65,6 @@ export function BulkAssignBar({ onApply, onReset }: BulkAssignBarProps) {
       >
         应用到筛选结果
       </Button>
-
-      {onReset && (
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-8 text-xs"
-          onClick={onReset}
-        >
-          重置为预设
-        </Button>
-      )}
     </div>
   );
 }

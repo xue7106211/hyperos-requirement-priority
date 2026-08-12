@@ -10,12 +10,4 @@ describe("BulkAssignBar", () => {
     fireEvent.click(screen.getByText("应用到筛选结果"));
     expect(fn).toHaveBeenCalled();
   });
-
-  it("点击重置为预设触发 onReset", () => {
-    const onApply = vi.fn();
-    const onReset = vi.fn();
-    render(<BulkAssignBar onApply={onApply} onReset={onReset} />);
-    fireEvent.click(screen.getByText("重置为预设"));
-    expect(onReset).toHaveBeenCalled();
-  });
 });
