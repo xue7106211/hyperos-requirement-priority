@@ -27,9 +27,10 @@ describe("csv 往返", () => {
   });
   it("脏行被跳过并记录原因，不影响合法行", () => {
     const csv = exportToCsv([req("1")]) + "\n坏数据,,,,\n";
-    const { requirements, report } = importFromCsv(csv);
+    const { requirements: _reqs, report } = importFromCsv(csv);
     expect(report.success).toBe(1);
     expect(report.skipped).toBeGreaterThan(0);
     expect(report.reasons.length).toBeGreaterThan(0);
+    expect(_reqs).toHaveLength(1);
   });
 });
