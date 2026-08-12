@@ -1,8 +1,10 @@
 import type { DimensionKey, DimensionScore, Weights } from "./types";
 import { DIMENSION_KEYS } from "./types";
+import { DEFAULT_WEIGHTS } from "./modelConfig";
 
 export function normalizeWeights(weights: Weights): { weights: Weights; wasNormalized: boolean } {
   const sum = DIMENSION_KEYS.reduce((a, k) => a + weights[k], 0);
+  if (Math.abs(sum) < 1e-9) return { weights: DEFAULT_WEIGHTS, wasNormalized: true };
   if (Math.abs(sum - 100) < 1e-9) return { weights, wasNormalized: false };
   const scaled = {} as Weights;
   for (const k of DIMENSION_KEYS) scaled[k] = (weights[k] / sum) * 100;

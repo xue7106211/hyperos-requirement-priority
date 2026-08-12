@@ -21,6 +21,16 @@ describe("normalizeWeights", () => {
     const sum = Object.values(r.weights).reduce((a,b)=>a+b,0);
     expect(sum).toBeCloseTo(100, 6);
   });
+  it("全零权重不产生 NaN，回退 DEFAULT_WEIGHTS", () => {
+    const zeroWeights = { strategy:0,userProblem:0,systemImpact:0,leverage:0,deviceEnable:0,competitive:0 };
+    const r = normalizeWeights(zeroWeights);
+    expect(r.wasNormalized).toBe(true);
+    expect(r.weights).toEqual(DEFAULT_WEIGHTS);
+    // 使用全零权重计算分值不应产生 NaN
+    const score = calculateValueScore(all(3), zeroWeights);
+    expect(Number.isFinite(score)).toBe(true);
+    expect(Number.isNaN(score)).toBe(false);
+  });
 });
 
 describe("calculateValueScore", () => {

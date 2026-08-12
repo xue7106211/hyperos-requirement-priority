@@ -100,6 +100,7 @@ function App() {
           <TabsContent value="scoring">
             <ScoringPage
               key={editTarget?.id ?? "new"}
+              config={config}
               initial={editTarget}
               onSaved={handleSaved}
             />
