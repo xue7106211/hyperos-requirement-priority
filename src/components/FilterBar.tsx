@@ -42,7 +42,7 @@ export function FilterBar({ filters, onChange, availableTags = [] }: FilterBarPr
         placeholder="搜索需求名…"
         value={filters.keyword}
         onChange={(e) => update({ keyword: e.target.value })}
-        className="w-48 rounded-sm"
+        className="w-48"
         aria-label="搜索需求名"
       />
 
@@ -50,7 +50,7 @@ export function FilterBar({ filters, onChange, availableTags = [] }: FilterBarPr
         value={filters.mainCategory || "__all__"}
         onValueChange={(v) => update({ mainCategory: v === "__all__" ? "" : v as MainCategory })}
       >
-        <SelectTrigger className="w-28 rounded-sm" aria-label="主类型">
+        <SelectTrigger className="w-28" aria-label="主类型">
           <SelectValue placeholder="主类型" />
         </SelectTrigger>
         <SelectContent>
@@ -65,7 +65,7 @@ export function FilterBar({ filters, onChange, availableTags = [] }: FilterBarPr
         value={filters.grade || "__all__"}
         onValueChange={(v) => update({ grade: v === "__all__" ? "" : v as Grade })}
       >
-        <SelectTrigger className="w-24 rounded-sm" aria-label="等级">
+        <SelectTrigger className="w-24" aria-label="等级">
           <SelectValue placeholder="等级" />
         </SelectTrigger>
         <SelectContent>
@@ -81,7 +81,7 @@ export function FilterBar({ filters, onChange, availableTags = [] }: FilterBarPr
         value={filters.confidence || "__all__"}
         onValueChange={(v) => update({ confidence: v === "__all__" ? "" : v as Confidence })}
       >
-        <SelectTrigger className="w-24 rounded-sm" aria-label="置信度">
+        <SelectTrigger className="w-24" aria-label="置信度">
           <SelectValue placeholder="置信度" />
         </SelectTrigger>
         <SelectContent>
@@ -97,7 +97,7 @@ export function FilterBar({ filters, onChange, availableTags = [] }: FilterBarPr
           value={filters.tag || "__all__"}
           onValueChange={(v) => update({ tag: v === "__all__" ? "" : v })}
         >
-          <SelectTrigger className="w-28 rounded-sm" aria-label="标签">
+          <SelectTrigger className="w-28" aria-label="标签">
             <SelectValue placeholder="标签" />
           </SelectTrigger>
           <SelectContent>

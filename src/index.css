@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    --background: 42 33% 97%;
-    --foreground: 30 12% 12%;
-    --card: 42 40% 99%;
-    --card-foreground: 30 12% 12%;
-    --popover: 42 40% 99%;
-    --popover-foreground: 30 12% 12%;
-    --primary: 30 12% 12%;
-    --primary-foreground: 42 33% 97%;
-    --secondary: 40 18% 94%;
-    --secondary-foreground: 30 12% 12%;
-    --muted: 40 16% 93%;
-    --muted-foreground: 30 8% 42%;
-    --accent: 40 16% 93%;
-    --accent-foreground: 30 12% 12%;
+    --background: 40 10% 94%;
+    --foreground: 30 8% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 30 8% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 8% 16%;
+    --primary: 30 8% 16%;
+    --primary-foreground: 40 20% 98%;
+    --secondary: 40 10% 94%;
+    --secondary-foreground: 30 8% 16%;
+    --muted: 40 10% 93%;
+    --muted-foreground: 30 6% 46%;
+    --accent: 40 10% 93%;
+    --accent-foreground: 30 8% 16%;
     --destructive: 18 78% 48%;
-    --destructive-foreground: 42 40% 99%;
-    --border: 30 10% 86%;
-    --input: 30 10% 86%;
-    --ring: 30 12% 12%;
-    --radius: 0.25rem;
+    --destructive-foreground: 40 20% 98%;
+    --border: 30 8% 88%;
+    --input: 40 10% 93%;
+    --ring: 30 8% 16%;
+    --radius: 0.875rem;
 
     --mark: oklch(0.68 0.185 48);
     --font-sans: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
@@ -41,16 +41,24 @@
     --z-tooltip: 300;
     --z-toast: 400;
 
-    --header-height: 5.25rem;
+    --header-height: 1.25rem;
+    --shell-radius: 1.75rem;
     --border-hairline: 1px;
 
     --elevation-raised:
-      0 0 0 1px oklch(0.22 0.02 55 / 0.06),
-      0 1px 3px oklch(0.22 0.02 55 / 0.04),
-      0 8px 20px -8px oklch(0.22 0.02 55 / 0.08);
+      0 0 0 1px rgb(0 0 0 / 0.04),
+      0 1px 2px rgb(0 0 0 / 0.04),
+      0 10px 24px -10px rgb(0 0 0 / 0.12);
+    --elevation-float:
+      0 0 0 1px rgb(0 0 0 / 0.08),
+      0 4px 10px rgb(0 0 0 / 0.06),
+      0 18px 40px -8px rgb(0 0 0 / 0.16),
+      0 36px 64px -16px rgb(0 0 0 / 0.10);
     --elevation-overlay:
-      0 0 0 1px oklch(0.22 0.02 55 / 0.08),
-      0 12px 32px -12px oklch(0.22 0.02 55 / 0.16);
+      0 0 0 1px rgb(0 0 0 / 0.05),
+      0 16px 40px -12px rgb(0 0 0 / 0.18);
+    --elevation-inset:
+      inset 0 1px 2px rgb(0 0 0 / 0.05);
   }
 
   @media only screen and (min-device-pixel-ratio: 2),
@@ -63,26 +71,28 @@
   .dark {
     --background: 30 8% 8%;
     --foreground: 40 20% 94%;
-    --card: 30 8% 10%;
+    --card: 30 8% 12%;
     --card-foreground: 40 20% 94%;
-    --popover: 30 8% 10%;
+    --popover: 30 8% 12%;
     --popover-foreground: 40 20% 94%;
     --primary: 40 20% 94%;
     --primary-foreground: 30 8% 8%;
-    --secondary: 30 8% 14%;
+    --secondary: 30 8% 16%;
     --secondary-foreground: 40 20% 94%;
-    --muted: 30 8% 14%;
+    --muted: 30 8% 16%;
     --muted-foreground: 35 10% 64%;
-    --accent: 30 8% 14%;
+    --accent: 30 8% 16%;
     --accent-foreground: 40 20% 94%;
     --destructive: 18 62% 42%;
     --destructive-foreground: 40 20% 94%;
-    --border: 30 6% 18%;
-    --input: 30 6% 18%;
+    --border: 30 6% 20%;
+    --input: 30 8% 16%;
     --ring: 40 20% 94%;
     --mark: oklch(0.72 0.16 48);
     --elevation-raised: 0 0 0 1px oklch(1 0 0 / 0.08);
+    --elevation-float: 0 0 0 1px oklch(1 0 0 / 0.12);
     --elevation-overlay: 0 0 0 1px oklch(1 0 0 / 0.12);
+    --elevation-inset: inset 0 1px 2px rgb(0 0 0 / 0.35);
   }
 }
 

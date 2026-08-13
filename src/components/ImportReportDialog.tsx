@@ -33,11 +33,11 @@ export function ImportReportDialog({ open, onClose, report }: ImportReportDialog
 
         <div className="space-y-3 text-sm">
           <div className="flex gap-4">
-            <div className="flex min-w-[5.5rem] flex-col items-center rounded-sm border px-4 py-2">
+            <div className="flex min-w-[5.5rem] flex-col items-center rounded-2xl bg-muted px-4 py-2">
               <span className="text-lg font-semibold tabular-nums">{report.success}</span>
               <span className="text-xs text-muted-foreground">成功导入</span>
             </div>
-            <div className="flex min-w-[5.5rem] flex-col items-center rounded-sm border px-4 py-2">
+            <div className="flex min-w-[5.5rem] flex-col items-center rounded-2xl bg-muted px-4 py-2">
               <span className="text-lg font-semibold tabular-nums">{report.skipped}</span>
               <span className="text-xs text-muted-foreground">跳过</span>
             </div>
@@ -46,7 +46,7 @@ export function ImportReportDialog({ open, onClose, report }: ImportReportDialog
           {report.reasons.length > 0 && (
             <div className="space-y-1">
               <p className="text-xs font-medium text-muted-foreground">跳过原因：</p>
-              <ul className="max-h-40 space-y-0.5 overflow-y-auto rounded-sm border bg-muted/30 p-2">
+              <ul className="max-h-40 space-y-0.5 overflow-y-auto rounded-xl bg-muted/60 p-2">
                 {report.reasons.map((reason, idx) => (
                   <li key={idx} className="text-xs text-muted-foreground">
                     {reason}

@@ -22,7 +22,7 @@ export function BulkAssignBar({ onApply }: BulkAssignBarProps) {
   const [score, setScore] = useState<0 | 1 | 2 | 3 | 4>(0);
 
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-sm border border-border bg-muted/30 px-3 py-2">
+    <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-muted/70 px-3 py-2">
       <span className="shrink-0 text-xs text-muted-foreground">批量赋值</span>
 
       <Select

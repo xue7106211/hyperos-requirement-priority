@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Settings } from "lucide-react";
+import { List, PenLine, Settings } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Requirement, ModelConfig } from "@/domain/types";
 import { loadConfig, saveConfig } from "@/store/storage";
@@ -52,72 +52,90 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <header className="sticky top-0 z-header isolate border-b border-border/80 bg-background/85 backdrop-blur-sm">
-          <motion.div
-            className="mx-auto flex h-[var(--header-height)] max-w-6xl items-end justify-between gap-6 px-6 pb-3"
-            initial={playIntro ? { opacity: 0, y: 8 } : false}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-          >
-            <div className="flex min-w-0 items-stretch gap-3">
-              <div
-                className="mt-1 w-[3px] shrink-0 self-stretch bg-mark"
-                aria-hidden="true"
-              />
-              <div className="min-w-0">
-                <p className="font-latin text-[11px] italic tracking-[0.22em] text-muted-foreground">
-                  HyperOS Design System
-                </p>
-                <h1 className="font-display text-[1.65rem] font-medium leading-none tracking-tight text-foreground">
-                  需求价值评估
-                </h1>
-              </div>
+    <div className="min-h-dvh bg-background px-3 py-3 md:px-5 md:py-5">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="mx-auto flex min-h-[calc(100dvh-1.5rem)] max-w-6xl flex-col gap-3 md:min-h-[calc(100dvh-2.5rem)] md:flex-row md:gap-4"
+      >
+        <motion.nav
+          aria-label="主导航"
+          className="flex shrink-0 flex-col gap-3 md:sticky md:top-5 md:h-[calc(100dvh-2.5rem)] md:w-52 md:py-2"
+          initial={playIntro ? { opacity: 0, y: 8 } : false}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+        >
+          <div className="flex min-w-0 items-start gap-2.5 px-1">
+            <span
+              className="mt-1.5 size-2.5 shrink-0 rounded-full bg-mark"
+              aria-hidden="true"
+            />
+            <div className="min-w-0">
+              <p className="text-[11px] tracking-[0.18em] text-muted-foreground">
+                HyperOS Design System
+              </p>
+              <h1 className="text-[1.05rem] font-medium leading-snug tracking-tight text-foreground text-balance">
+                系统组件需求价值评估
+              </h1>
             </div>
+          </div>
 
-            <div className="flex shrink-0 items-end gap-5">
-              <TabsList>
-                <TabsTrigger value="scoring">单条打分</TabsTrigger>
-                <TabsTrigger value="list">批量清单</TabsTrigger>
-              </TabsList>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="mb-0.5 text-muted-foreground hover:text-foreground"
-                onClick={() => setSettingsOpen(true)}
-                aria-label="设置"
+          <div className="flex items-center gap-2 md:min-h-0 md:flex-1 md:flex-col md:items-stretch">
+            <TabsList className="h-auto min-h-0 flex-1 flex-row gap-1 rounded-2xl bg-transparent p-0 shadow-none md:mt-5 md:w-full md:flex-none md:flex-col">
+              <TabsTrigger
+                value="scoring"
+                className="h-10 flex-1 gap-2 rounded-xl px-3 data-[state=active]:bg-card md:flex-none md:w-full md:justify-start"
               >
-                <Settings />
-              </Button>
-            </div>
-          </motion.div>
-        </header>
+                <PenLine className="size-4 shrink-0" aria-hidden="true" />
+                单条打分
+              </TabsTrigger>
+              <TabsTrigger
+                value="list"
+                className="h-10 flex-1 gap-2 rounded-xl px-3 data-[state=active]:bg-card md:flex-none md:w-full md:justify-start"
+              >
+                <List className="size-4 shrink-0" aria-hidden="true" />
+                批量清单
+              </TabsTrigger>
+            </TabsList>
 
-        <div className="mx-auto max-w-6xl px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-8">
-          <TabsContent value="scoring">
-            <ScoringPage
-              key={editTarget?.id ?? "new"}
-              config={config}
-              initial={editTarget}
-              onSaved={handleSaved}
-            />
-          </TabsContent>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="bg-card text-muted-foreground shadow-raised hover:text-foreground md:mt-auto"
+              onClick={() => setSettingsOpen(true)}
+              aria-label="设置"
+            >
+              <Settings />
+            </Button>
+          </div>
+        </motion.nav>
 
-          <TabsContent value="list">
-            <ListPage
-              key={refreshKey}
-              onEditRequirement={handleEditRequirement}
-              onCreateNew={handleCreateNew}
-            />
-          </TabsContent>
+        <div className="min-w-0 flex-1 rounded-shell bg-card shadow-raised">
+          <div className="px-5 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:px-7 md:py-8">
+            <TabsContent value="scoring">
+              <ScoringPage
+                key={editTarget?.id ?? "new"}
+                config={config}
+                initial={editTarget}
+                onSaved={handleSaved}
+              />
+            </TabsContent>
+
+            <TabsContent value="list">
+              <ListPage
+                key={refreshKey}
+                onEditRequirement={handleEditRequirement}
+                onCreateNew={handleCreateNew}
+              />
+            </TabsContent>
+          </div>
         </div>
       </Tabs>
 
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <DialogContent className="max-w-md rounded-sm">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-display text-base font-medium">
+            <DialogTitle className="text-base font-medium">
               评估模型设置
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">

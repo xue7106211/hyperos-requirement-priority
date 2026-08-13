@@ -19,7 +19,11 @@ export function ScoreSelector({ value, onChange, anchors }: ScoreSelectorProps) 
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="inline-flex gap-1" role="radiogroup" aria-label="评分档位">
+      <div
+        className="inline-flex rounded-full bg-muted p-1 shadow-inset"
+        role="radiogroup"
+        aria-label="评分档位"
+      >
         {scores.map((score) => (
           <Tooltip key={score}>
             <TooltipTrigger asChild>
@@ -30,10 +34,10 @@ export function ScoreSelector({ value, onChange, anchors }: ScoreSelectorProps) 
                 aria-label={`${score}：${anchors[score]}`}
                 onClick={() => onChange(score)}
                 className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-sm text-sm font-semibold tabular-nums transition-[color,background-color,transform] duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                  "flex size-9 items-center justify-center rounded-full text-sm font-semibold tabular-nums transition-[color,background-color,box-shadow,transform] duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15",
                   score === value
-                    ? "bg-foreground text-background"
-                    : "bg-muted text-muted-foreground hover:bg-foreground/10"
+                    ? "bg-card text-foreground shadow-raised"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {score}

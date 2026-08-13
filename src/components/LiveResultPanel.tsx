@@ -46,10 +46,11 @@ export function LiveResultPanel({
     result.valueScore !== null ? result.valueScore.toFixed(1) : "—";
 
   return (
-    <aside
-      aria-live="polite"
-      className="sticky top-[calc(var(--header-height)+0.75rem)] min-h-[24rem] border border-border bg-card p-7 shadow-raised"
-    >
+    <div className="sticky top-5 rounded-[1.35rem] bg-muted p-[5px]">
+      <aside
+        aria-live="polite"
+        className="min-h-[24rem] rounded-[1.15rem] bg-card p-7 shadow-[var(--elevation-float)]"
+      >
       <p className="font-latin text-[11px] italic tracking-[0.18em] text-muted-foreground">
         Grade
       </p>
@@ -122,5 +123,6 @@ export function LiveResultPanel({
         </p>
       </div>
     </aside>
+    </div>
   );
 }

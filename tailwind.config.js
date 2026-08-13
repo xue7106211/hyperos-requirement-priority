@@ -56,10 +56,13 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        shell: "var(--shell-radius)",
       },
       boxShadow: {
         raised: "var(--elevation-raised)",
+        float: "var(--elevation-float)",
         overlay: "var(--elevation-overlay)",
+        inset: "var(--elevation-inset)",
       },
       zIndex: {
         header: "var(--z-header)",

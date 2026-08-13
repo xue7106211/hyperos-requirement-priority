@@ -23,7 +23,7 @@ export function ScoringPage({ config, initial, onSaved }: ScoringPageProps) {
 
   return (
     <main>
-      <p className="mb-10 max-w-[36rem] font-display text-lg leading-relaxed text-foreground/70 text-pretty">
+      <p className="mb-8 max-w-[36rem] text-[15px] leading-relaxed text-muted-foreground text-pretty">
         填写需求信息与六维评分，右侧即时给出价值等级。命中第 0 层直升条件时跳过打分，直接定级。
       </p>
       <RequirementForm initial={initial} config={config} onSave={handleSave} />

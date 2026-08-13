@@ -154,9 +154,9 @@ export function ListPage({ onEditRequirement, onCreateNew }: ListPageProps) {
   const isEmptyFilter = !isEmptyPool && filtered.length === 0;
 
   return (
-    <div className="space-y-4 pt-6">
+    <div className="space-y-4 pt-2">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="font-display text-2xl font-medium tracking-tight">需求清单</h2>
+        <h2 className="text-2xl font-medium tracking-tight">需求清单</h2>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={handleExport} disabled={isEmptyPool}>
             导出 CSV
@@ -186,7 +186,7 @@ export function ListPage({ onEditRequirement, onCreateNew }: ListPageProps) {
       )}
 
       {isEmptyPool ? (
-        <div className="flex min-h-[22rem] flex-col items-center justify-center border border-dashed border-border px-6 py-16 text-center">
+        <div className="flex min-h-[22rem] flex-col items-center justify-center rounded-2xl bg-muted/50 px-6 py-16 text-center">
           <div
             role="img"
             aria-label="空白评估册示意：高低错落的评分条"
@@ -196,12 +196,12 @@ export function ListPage({ onEditRequirement, onCreateNew }: ListPageProps) {
             {[28, 52, 36, 64, 20].map((height) => (
               <div
                 key={height}
-                className="w-3 bg-foreground/15"
+                className="w-3 rounded-full bg-foreground/15"
                 style={{ height }}
               />
             ))}
           </div>
-          <h3 className="font-display text-xl font-medium tracking-tight text-foreground">
+          <h3 className="text-xl font-medium tracking-tight text-foreground">
             还没有评估记录
           </h3>
           <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground text-pretty">
@@ -217,8 +217,8 @@ export function ListPage({ onEditRequirement, onCreateNew }: ListPageProps) {
           </div>
         </div>
       ) : isEmptyFilter ? (
-        <div className="flex min-h-[22rem] flex-col items-center justify-center border border-dashed border-border px-6 py-16 text-center">
-          <h3 className="font-display text-xl font-medium tracking-tight text-foreground">
+        <div className="flex min-h-[22rem] flex-col items-center justify-center rounded-2xl bg-muted/50 px-6 py-16 text-center">
+          <h3 className="text-xl font-medium tracking-tight text-foreground">
             没有符合筛选条件的需求
           </h3>
           <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground text-pretty">

@@ -51,64 +51,66 @@ export function RequirementTable({ requirements, onRowClick }: RequirementTableP
   const sorted = sortRequirements(requirements);
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-10">#</TableHead>
-          <TableHead>需求名</TableHead>
-          <TableHead className="w-24">主类型</TableHead>
-          <TableHead className="w-16">等级</TableHead>
-          <TableHead className="w-20">价值分</TableHead>
-          <TableHead className="w-16">置信度</TableHead>
-          <TableHead className="w-20">状态</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {sorted.map((req, idx) => (
-          <TableRow
-            key={req.id}
-            tabIndex={0}
-            aria-label={`查看 ${req.name || "未命名需求"}`}
-            className="h-11 cursor-pointer focus-visible:bg-muted/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-inset"
-            onClick={() => onRowClick(req)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onRowClick(req);
-              }
-            }}
-          >
-            <TableCell className="text-muted-foreground tabular-nums">
-              {idx + 1}
-            </TableCell>
-            <TableCell className="max-w-[16rem] truncate font-medium">
-              {req.name || "未命名需求"}
-            </TableCell>
-            <TableCell className="text-xs text-muted-foreground">
-              {req.mainCategory}
-            </TableCell>
-            <TableCell>
-              <GradeBadge grade={req.grade} />
-            </TableCell>
-            <TableCell className="tabular-nums">
-              {req.valueScore === null ? (
-                <span className="text-xs text-muted-foreground">直升</span>
-              ) : (
-                req.valueScore.toFixed(1)
-              )}
-            </TableCell>
-            <TableCell className="text-xs">{req.confidence}</TableCell>
-            <TableCell>
-              <Badge
-                variant="secondary"
-                className="rounded-sm text-[10px] font-normal"
-              >
-                {req.manuallyAdjusted ? "已人工调整" : "仍为预设"}
-              </Badge>
-            </TableCell>
+    <div className="overflow-hidden rounded-2xl bg-muted/40">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-10">#</TableHead>
+            <TableHead>需求名</TableHead>
+            <TableHead className="w-24">主类型</TableHead>
+            <TableHead className="w-16">等级</TableHead>
+            <TableHead className="w-20">价值分</TableHead>
+            <TableHead className="w-16">置信度</TableHead>
+            <TableHead className="w-20">状态</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {sorted.map((req, idx) => (
+            <TableRow
+              key={req.id}
+              tabIndex={0}
+              aria-label={`查看 ${req.name || "未命名需求"}`}
+              className="h-11 cursor-pointer focus-visible:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15 focus-visible:ring-inset"
+              onClick={() => onRowClick(req)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onRowClick(req);
+                }
+              }}
+            >
+              <TableCell className="text-muted-foreground tabular-nums">
+                {idx + 1}
+              </TableCell>
+              <TableCell className="max-w-[16rem] truncate font-medium">
+                {req.name || "未命名需求"}
+              </TableCell>
+              <TableCell className="text-xs text-muted-foreground">
+                {req.mainCategory}
+              </TableCell>
+              <TableCell>
+                <GradeBadge grade={req.grade} />
+              </TableCell>
+              <TableCell className="tabular-nums">
+                {req.valueScore === null ? (
+                  <span className="text-xs text-muted-foreground">直升</span>
+                ) : (
+                  req.valueScore.toFixed(1)
+                )}
+              </TableCell>
+              <TableCell className="text-xs">{req.confidence}</TableCell>
+              <TableCell>
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] font-normal"
+                >
+                  {req.manuallyAdjusted ? "已人工调整" : "仍为预设"}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

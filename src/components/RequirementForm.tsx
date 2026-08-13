@@ -350,10 +350,10 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
                   key={opt.value ?? "none"}
                   htmlFor={inputId}
                   className={cn(
-                    "flex min-h-10 items-center gap-3 rounded-sm border px-3 py-2.5 text-sm cursor-pointer transition-[border-color,background-color] duration-150 ease-out",
+                    "flex min-h-10 items-center gap-3 rounded-xl px-3 py-2.5 text-sm cursor-pointer transition-[background-color,box-shadow] duration-150 ease-out",
                     isSelected
-                      ? "border-foreground bg-muted"
-                      : "border-border hover:border-foreground/30"
+                      ? "bg-muted text-foreground shadow-inset"
+                      : "hover:bg-muted/60"
                   )}
                 >
                   <input
@@ -374,7 +374,7 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
 
         {/* ── 错误提示 ─────────────────────────────────────────────────── */}
         {errorMessages.length > 0 && (
-          <div className="rounded-sm border border-red-200 bg-red-50 p-3 text-sm text-red-700 space-y-1">
+          <div className="rounded-xl bg-red-50 p-3 text-sm text-red-700 space-y-1">
             {errorMessages.map((msg, i) => (
               <p key={i}>{msg}</p>
             ))}
@@ -383,7 +383,7 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
 
         {/* ── 保存按钮 ─────────────────────────────────────────────────── */}
         <div className="pt-2">
-          <Button onClick={handleSave} className="rounded-sm">
+          <Button onClick={handleSave}>
             保存评估
           </Button>
         </div>
@@ -417,11 +417,10 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
             <Button
               variant="outline"
               onClick={() => setWarningDialog(null)}
-              className="rounded-sm"
             >
               取消
             </Button>
-            <Button onClick={confirmSave} className="rounded-sm">
+            <Button onClick={confirmSave}>
               仍然保存
             </Button>
           </DialogFooter>
