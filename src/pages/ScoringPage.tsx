@@ -1,3 +1,4 @@
+import { Info } from "lucide-react";
 import type { Requirement, ModelConfig } from "@/domain/types";
 import { loadRequirements, saveRequirements } from "@/store/storage";
 import { RequirementForm } from "@/components/RequirementForm";
@@ -23,9 +24,18 @@ export function ScoringPage({ config, initial, onSaved }: ScoringPageProps) {
 
   return (
     <main>
-      <p className="mb-8 max-w-[36rem] text-[15px] leading-relaxed text-muted-foreground text-pretty">
-        填写需求信息与六维评分，右侧即时给出价值等级。命中第 0 层直升条件时跳过打分，直接定级。
-      </p>
+      <div
+        role="note"
+        className="mb-8 flex max-w-[40rem] gap-3 rounded-2xl bg-muted px-4 py-3.5"
+      >
+        <Info
+          className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+          aria-hidden="true"
+        />
+        <p className="text-sm leading-relaxed text-muted-foreground text-pretty">
+          填写需求信息与六维评分，右侧即时给出价值等级。命中第 0 层直升条件时跳过打分，直接定级。
+        </p>
+      </div>
       <RequirementForm initial={initial} config={config} onSave={handleSave} />
     </main>
   );

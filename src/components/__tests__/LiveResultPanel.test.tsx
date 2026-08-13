@@ -22,6 +22,7 @@ describe("LiveResultPanel", () => {
     );
     expect(screen.getByText("78.5")).toBeInTheDocument();
     expect(screen.getByText("A")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /六维评分雷达/ })).toBeInTheDocument();
   });
 
   it("直升时显示「直升」而非分数", () => {
@@ -41,6 +42,7 @@ describe("LiveResultPanel", () => {
       />
     );
     expect(screen.getByText(/直升 ·/)).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: /六维评分雷达/ })).not.toBeInTheDocument();
   });
 
   it("wasNormalized 为 true 时显示归一化提示", () => {

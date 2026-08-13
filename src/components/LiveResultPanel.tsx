@@ -4,6 +4,7 @@ import { DIMENSION_KEYS } from "@/domain/types";
 import { DIMENSION_META, ESCALATION_META } from "@/domain/modelConfig";
 import type { EvaluationResult } from "@/domain/evaluate";
 import { GradeBadge } from "@/components/GradeBadge";
+import { DimensionRadar } from "@/components/DimensionRadar";
 
 interface LiveResultPanelProps {
   result: EvaluationResult;
@@ -40,8 +41,6 @@ export function LiveResultPanel({
       contribution: Math.round(contribution * 10) / 10,
     };
   });
-  const maxContribution = Math.max(...contributions.map((c) => c.contribution), 1);
-
   const scoreLabel =
     result.valueScore !== null ? result.valueScore.toFixed(1) : "—";
 
@@ -85,24 +84,20 @@ export function LiveResultPanel({
       </div>
 
       {!isEscalated && (
-        <div className="mt-5 space-y-3 border-t border-border/80 pt-5">
+        <div className="mt-5 space-y-4 border-t border-border/80 pt-5">
+          <DimensionRadar scores={scores} />
           <p className="text-[11px] font-medium tracking-[0.16em] text-muted-foreground">
             各维贡献
           </p>
           {contributions.map((dim) => (
-            <div key={dim.key} className="space-y-1">
-              <div className="flex items-baseline justify-between gap-3 text-sm">
-                <span className="truncate text-foreground/80">{dim.label}</span>
-                <span className="w-10 shrink-0 text-right font-medium tabular-nums text-foreground">
-                  {dim.contribution.toFixed(1)}
-                </span>
-              </div>
-              <div className="h-px overflow-hidden bg-border">
-                <div
-                  className="h-full origin-left bg-foreground transition-transform duration-150 ease-out"
-                  style={{ transform: `scaleX(${dim.contribution / maxContribution})` }}
-                />
-              </div>
+            <div
+              key={dim.key}
+              className="flex items-baseline justify-between gap-3 text-sm"
+            >
+              <span className="truncate text-foreground/80">{dim.label}</span>
+              <span className="w-10 shrink-0 text-right font-medium tabular-nums text-foreground">
+                {dim.contribution.toFixed(1)}
+              </span>
             </div>
           ))}
         </div>
