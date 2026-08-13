@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import type { DimensionKey, Weights, EscalationTrigger, DimensionScore } from "@/domain/types";
+import type { DimensionKey, Weights, EscalationTrigger, DimensionScore, Confidence } from "@/domain/types";
 import { DIMENSION_KEYS } from "@/domain/types";
 import { DIMENSION_META, ESCALATION_META } from "@/domain/modelConfig";
 import type { EvaluationResult } from "@/domain/evaluate";
@@ -10,6 +10,7 @@ interface LiveResultPanelProps {
   scores: Record<DimensionKey, DimensionScore>;
   weights: Weights;
   escalationTrigger: EscalationTrigger;
+  confidence: Confidence;
 }
 
 /**
@@ -21,6 +22,7 @@ export function LiveResultPanel({
   scores,
   weights: _weights,
   escalationTrigger,
+  confidence,
 }: LiveResultPanelProps) {
   const isEscalated = escalationTrigger !== null || result.valueScore === null;
 
@@ -131,10 +133,10 @@ export function LiveResultPanel({
         </div>
       )}
 
-      {/* 置信度 (预留位) */}
+      {/* 置信度 */}
       <div className="border-t border-neutral-100 pt-3">
         <p className="text-xs text-neutral-400 tracking-wide">
-          置信度 —
+          置信度 <span data-testid="confidence-display" className="text-neutral-600 font-medium">{confidence}</span>
         </p>
       </div>
     </aside>

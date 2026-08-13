@@ -6,6 +6,7 @@ import type {
   DimensionKey,
   DimensionScore,
   EscalationTrigger,
+  Confidence,
 } from "@/domain/types";
 import { DIMENSION_KEYS } from "@/domain/types";
 import { DIMENSION_META, ESCALATION_META, MODEL_VERSION } from "@/domain/modelConfig";
@@ -45,6 +46,8 @@ const ESCALATION_OPTIONS: { value: EscalationTrigger; label: string }[] = [
     label: meta.label,
   })),
 ];
+
+const CONFIDENCE_OPTIONS: Confidence[] = ["高", "中", "低"];
 
 function createEmptyScores(): Record<DimensionKey, DimensionScore> {
   const scores = {} as Record<DimensionKey, DimensionScore>;
@@ -236,6 +239,26 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
                 className="mt-1"
               />
             </div>
+            <div>
+              <Label htmlFor="req-confidence" className="text-xs text-neutral-600">
+                置信度
+              </Label>
+              <Select
+                value={draft.confidence}
+                onValueChange={(v) => updateField("confidence", v as Confidence)}
+              >
+                <SelectTrigger id="req-confidence" className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CONFIDENCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </section>
 
@@ -330,6 +353,7 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
         scores={draft.scores}
         weights={config.weights}
         escalationTrigger={draft.escalationTrigger}
+        confidence={draft.confidence}
       />
 
       {/* Warning dialog */}

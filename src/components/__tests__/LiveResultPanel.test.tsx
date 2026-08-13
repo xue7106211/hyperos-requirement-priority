@@ -17,6 +17,7 @@ describe("LiveResultPanel", () => {
         scores={{} as any}
         weights={DEFAULT_WEIGHTS}
         escalationTrigger={null}
+        confidence="中"
       />
     );
     expect(screen.getByText("78.5")).toBeInTheDocument();
@@ -36,6 +37,7 @@ describe("LiveResultPanel", () => {
         scores={{} as any}
         weights={DEFAULT_WEIGHTS}
         escalationTrigger={"legal"}
+        confidence="中"
       />
     );
     expect(screen.getByText(/直升 ·/)).toBeInTheDocument();
@@ -54,6 +56,7 @@ describe("LiveResultPanel", () => {
         scores={{} as any}
         weights={DEFAULT_WEIGHTS}
         escalationTrigger={null}
+        confidence="中"
       />
     );
     expect(screen.getByText(/已按比例归一化/)).toBeInTheDocument();
@@ -72,8 +75,29 @@ describe("LiveResultPanel", () => {
         scores={{} as any}
         weights={DEFAULT_WEIGHTS}
         escalationTrigger={null}
+        confidence="中"
       />
     );
     expect(screen.queryByText(/已按比例归一化/)).not.toBeInTheDocument();
+  });
+
+  it("显示传入的置信度值", () => {
+    render(
+      <LiveResultPanel
+        result={{
+          valueScore: 78.5,
+          grade: "A",
+          weightsSnapshot: DEFAULT_WEIGHTS,
+          thresholdsSnapshot: { S: 85, A: 70, B: 50 },
+          wasNormalized: false,
+        }}
+        scores={{} as any}
+        weights={DEFAULT_WEIGHTS}
+        escalationTrigger={null}
+        confidence="高"
+      />
+    );
+    const display = screen.getByTestId("confidence-display");
+    expect(display).toHaveTextContent("高");
   });
 });
