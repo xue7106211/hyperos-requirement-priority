@@ -13,9 +13,11 @@ describe("modelConfig", () => {
   it("模型版本为 v2.0", () => {
     expect(MODEL_VERSION).toBe("HyperOS Requirement Value Model v2.0");
   });
-  it("六维都有名称和 5 档锚点文案", () => {
+  it("六维都有名称、判断说明、易错提示和 5 档锚点文案", () => {
     for (const k of DIMENSION_KEYS) {
       expect(DIMENSION_META[k].label.length).toBeGreaterThan(0);
+      expect(DIMENSION_META[k].hint.length).toBeGreaterThan(0);
+      expect(DIMENSION_META[k].caution.length).toBeGreaterThan(0);
       expect(DIMENSION_META[k].anchors).toHaveLength(5);
     }
   });

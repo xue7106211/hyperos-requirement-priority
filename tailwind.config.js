@@ -11,12 +11,18 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)"],
+        display: ["var(--font-display)"],
+        latin: ["var(--font-latin)"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        mark: "var(--mark)",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -50,6 +56,23 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        raised: "var(--elevation-raised)",
+        overlay: "var(--elevation-overlay)",
+      },
+      zIndex: {
+        header: "var(--z-header)",
+        dropdown: "var(--z-dropdown)",
+        modal: "var(--z-modal)",
+        tooltip: "var(--z-tooltip)",
+        toast: "var(--z-toast)",
+      },
+      borderWidth: {
+        hairline: "var(--border-hairline)",
+      },
+      transitionDuration: {
+        150: "150ms",
       },
     },
   },

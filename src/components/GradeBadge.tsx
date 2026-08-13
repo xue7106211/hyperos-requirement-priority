@@ -1,19 +1,28 @@
 import { cn } from "@/lib/utils";
 import type { Grade } from "@/domain/types";
 
-const gradeStyles: Record<Grade, string> = {
-  S: "bg-neutral-900 text-white",
-  A: "bg-neutral-700 text-white",
-  B: "bg-neutral-400 text-white",
-  C: "bg-neutral-200 text-neutral-600",
-};
+interface GradeBadgeProps {
+  grade: Grade;
+  size?: "compact" | "display";
+}
 
-export function GradeBadge({ grade }: { grade: Grade }) {
+export function GradeBadge({ grade, size = "compact" }: GradeBadgeProps) {
+  if (size === "display") {
+    return (
+      <span
+        className={cn(
+          "inline-block select-none font-display text-7xl font-medium leading-none tracking-tight text-foreground"
+        )}
+      >
+        {grade}
+      </span>
+    );
+  }
+
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center rounded-sm px-2 py-0.5 text-xs font-bold leading-none tracking-wide select-none",
-        gradeStyles[grade]
+        "inline-flex min-w-[1.25rem] select-none items-center justify-center font-display text-sm font-medium leading-none text-foreground"
       )}
     >
       {grade}

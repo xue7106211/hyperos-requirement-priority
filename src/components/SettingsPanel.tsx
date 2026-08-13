@@ -36,13 +36,13 @@ export function SettingsPanel({ config, onChange }: SettingsPanelProps) {
     <div className="space-y-6">
       {/* 权重设置 */}
       <section className="space-y-3">
-        <h3 className="text-sm font-medium text-neutral-900">维度权重</h3>
+        <h3 className="font-display text-base font-medium text-foreground">维度权重</h3>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {DIMENSION_KEYS.map((key) => (
             <div key={key} className="flex items-center gap-2">
               <Label
                 htmlFor={`weight-${key}`}
-                className="w-32 shrink-0 text-xs text-neutral-700"
+                className="w-32 shrink-0 text-xs text-foreground/80"
               >
                 {DIMENSION_META[key].label}
               </Label>
@@ -56,15 +56,15 @@ export function SettingsPanel({ config, onChange }: SettingsPanelProps) {
                 onChange={(e) =>
                   handleWeightChange(key, Number(e.target.value) || 0)
                 }
-                className="h-8 w-20 rounded-sm text-xs"
+                className="h-9 w-20 rounded-sm tabular-nums"
               />
             </div>
           ))}
         </div>
-        <p className="text-xs text-neutral-400">
+        <p className="text-xs tabular-nums text-muted-foreground">
           合计：{Math.round(weightSum * 100) / 100}
           {needsNormalization && (
-            <span className="ml-2 text-neutral-700">
+            <span className="ml-2 text-foreground">
               （将按比例归一化）
             </span>
           )}
@@ -73,13 +73,13 @@ export function SettingsPanel({ config, onChange }: SettingsPanelProps) {
 
       {/* 阈值设置 */}
       <section className="space-y-3">
-        <h3 className="text-sm font-medium text-neutral-900">等级阈值</h3>
+        <h3 className="font-display text-base font-medium text-foreground">等级阈值</h3>
         <div className="flex flex-wrap gap-4">
           {(["S", "A", "B"] as const).map((grade) => (
             <div key={grade} className="flex items-center gap-2">
               <Label
                 htmlFor={`threshold-${grade}`}
-                className="text-xs text-neutral-700"
+                className="text-xs text-foreground/80"
               >
                 {grade} 级 ≥
               </Label>
@@ -93,7 +93,7 @@ export function SettingsPanel({ config, onChange }: SettingsPanelProps) {
                 onChange={(e) =>
                   handleThresholdChange(grade, Number(e.target.value) || 0)
                 }
-                className="h-8 w-20 rounded-sm text-xs"
+                className="h-9 w-20 rounded-sm tabular-nums"
               />
             </div>
           ))}
@@ -106,7 +106,7 @@ export function SettingsPanel({ config, onChange }: SettingsPanelProps) {
           variant="outline"
           size="sm"
           onClick={handleResetDefault}
-          className="rounded-sm text-xs"
+          className="rounded-sm"
         >
           恢复默认
         </Button>

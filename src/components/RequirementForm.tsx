@@ -178,17 +178,17 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
 
   // ─── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
+    <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[1fr_340px]">
       {/* Left: Form */}
       <div className="space-y-8">
         {/* ── 基础信息 ───────────────────────────────────────────────────── */}
         <section className="space-y-4">
-          <h2 className="text-sm font-medium text-neutral-500 tracking-wide">
+          <h2 className="text-sm font-medium tracking-wide text-muted-foreground">
             基础信息
           </h2>
           <div className="space-y-3">
             <div>
-              <Label htmlFor="req-name" className="text-xs text-neutral-600">
+              <Label htmlFor="req-name" className="text-xs text-muted-foreground">
                 需求名称
               </Label>
               <Input
@@ -200,7 +200,7 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
               />
             </div>
             <div>
-              <Label htmlFor="req-category" className="text-xs text-neutral-600">
+              <Label htmlFor="req-category" className="text-xs text-muted-foreground">
                 主类型
               </Label>
               <Select
@@ -220,7 +220,7 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
               </Select>
             </div>
             <div>
-              <Label htmlFor="req-tags" className="text-xs text-neutral-600">
+              <Label htmlFor="req-tags" className="text-xs text-muted-foreground">
                 二级标签
               </Label>
               <Input
@@ -235,12 +235,12 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
                       .filter(Boolean)
                   )
                 }
-                placeholder="逗号分隔"
+                placeholder="逗号分隔，例如 Token、折叠屏"
                 className="mt-1"
               />
             </div>
             <div>
-              <Label htmlFor="req-confidence" className="text-xs text-neutral-600">
+              <Label htmlFor="req-confidence" className="text-xs text-muted-foreground">
                 置信度
               </Label>
               <Select
@@ -264,7 +264,7 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
 
         {/* ── 第 0 层 直升 ──────────────────────────────────────────────── */}
         <section className="space-y-3">
-          <h2 className="text-sm font-medium text-neutral-500 tracking-wide">
+          <h2 className="text-sm font-medium tracking-wide text-muted-foreground">
             第 0 层 · 直升判定
           </h2>
           <div className="space-y-2" role="radiogroup" aria-label="直升条件">
@@ -277,10 +277,10 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
                   key={opt.value ?? "none"}
                   htmlFor={inputId}
                   className={cn(
-                    "flex items-center gap-3 rounded-sm border px-3 py-2 text-sm cursor-pointer transition-colors",
+                    "flex min-h-10 items-center gap-3 rounded-sm border px-3 py-2.5 text-sm cursor-pointer transition-[border-color,background-color] duration-150 ease-out",
                     isSelected
-                      ? "border-neutral-900 bg-neutral-50"
-                      : "border-neutral-200 hover:border-neutral-300"
+                      ? "border-foreground bg-muted"
+                      : "border-border hover:border-foreground/30"
                   )}
                 >
                   <input
@@ -289,10 +289,10 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
                     name="escalation"
                     checked={isSelected}
                     onChange={() => updateField("escalationTrigger", opt.value)}
-                    className="accent-neutral-900"
+                    className="accent-foreground"
                     aria-label={opt.label}
                   />
-                  <span className="text-neutral-700">{opt.label}</span>
+                  <span className="text-foreground/80">{opt.label}</span>
                 </label>
               );
             })}
@@ -303,31 +303,73 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
         <section
           className={cn(
             "space-y-6 transition-opacity",
-            isEscalated && "opacity-50 pointer-events-none"
+            isEscalated && "pointer-events-none opacity-50"
           )}
           data-testid="dimension-section"
+          aria-disabled={isEscalated}
         >
-          <h2 className="text-sm font-medium text-neutral-500 tracking-wide">
+          <h2 className="text-sm font-medium tracking-wide text-muted-foreground">
             六维评分
           </h2>
-          {DIMENSION_KEYS.map((dim) => (
-            <div key={dim} className="space-y-2">
-              <Label className="text-xs font-medium text-neutral-700">
-                {DIMENSION_META[dim].label}
-              </Label>
-              <ScoreSelector
-                value={draft.scores[dim].score}
-                onChange={(v) => updateScore(dim, v)}
-                anchors={DIMENSION_META[dim].anchors}
-              />
-              <Textarea
-                value={draft.scores[dim].reason}
-                onChange={(e) => updateReason(dim, e.target.value)}
-                placeholder="评分理由（选填）"
-                className="mt-1 min-h-[56px] resize-none text-sm"
-              />
-            </div>
-          ))}
+          {DIMENSION_KEYS.map((dim) => {
+            const meta = DIMENSION_META[dim];
+            const score = draft.scores[dim].score;
+            const hintId = `dim-hint-${dim}`;
+            return (
+              <div key={dim} className="space-y-2.5">
+                <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+                  <div className="min-w-[12rem] flex-1">
+                    <Label className="text-sm font-medium text-foreground">
+                      {meta.label}
+                    </Label>
+                    <p
+                      id={hintId}
+                      className="mt-1 max-w-[36rem] text-xs leading-relaxed text-muted-foreground text-pretty"
+                    >
+                      {meta.hint}
+                    </p>
+                  </div>
+                  <ScoreSelector
+                    value={score}
+                    onChange={(v) => updateScore(dim, v)}
+                    anchors={meta.anchors}
+                  />
+                </div>
+                <p className="text-sm leading-relaxed text-foreground/85" aria-live="polite">
+                  <span className="font-medium tabular-nums">{score}</span>
+                  <span className="text-muted-foreground"> 分 · </span>
+                  {meta.anchors[score]}
+                </p>
+                <details className="group text-xs text-muted-foreground">
+                  <summary className="cursor-pointer select-none tracking-wide transition-colors duration-150 ease-out hover:text-foreground">
+                    查看 0–4 分标准
+                  </summary>
+                  <ol className="mt-2 space-y-1 border-l border-border pl-3">
+                    {meta.anchors.map((anchor, i) => (
+                      <li
+                        key={anchor}
+                        className={cn(
+                          "leading-relaxed",
+                          i === score ? "text-foreground" : "text-muted-foreground/80"
+                        )}
+                      >
+                        <span className="mr-2 inline-block w-3 tabular-nums">{i}</span>
+                        {anchor}
+                      </li>
+                    ))}
+                  </ol>
+                  <p className="mt-2 leading-relaxed text-pretty">{meta.caution}</p>
+                </details>
+                <Textarea
+                  value={draft.scores[dim].reason}
+                  onChange={(e) => updateReason(dim, e.target.value)}
+                  placeholder="评分理由（选填）"
+                  className="min-h-[56px] resize-none text-sm"
+                  aria-describedby={hintId}
+                />
+              </div>
+            );
+          })}
         </section>
 
         {/* ── 错误提示 ─────────────────────────────────────────────────── */}
@@ -368,7 +410,7 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
               以下提醒不影响保存，确认继续？
             </DialogDescription>
           </DialogHeader>
-          <ul className="space-y-1 text-sm text-neutral-600 pl-4 list-disc">
+          <ul className="list-disc space-y-1 pl-4 text-sm text-muted-foreground">
             {warningDialog?.map((w, i) => <li key={i}>{w}</li>)}
           </ul>
           <DialogFooter>

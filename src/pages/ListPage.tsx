@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 
 interface ListPageProps {
   onEditRequirement: (req: Requirement) => void;
+  onCreateNew: () => void;
 }
 
 /**
@@ -41,7 +42,7 @@ function extractTags(reqs: Requirement[]): string[] {
   return [...set].sort();
 }
 
-export function ListPage({ onEditRequirement }: ListPageProps) {
+export function ListPage({ onEditRequirement, onCreateNew }: ListPageProps) {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [refreshKey, setRefreshKey] = useState(0);
   const [importReport, setImportReport] = useState<{ success: number; skipped: number; reasons: string[] } | null>(null);
@@ -149,15 +150,18 @@ export function ListPage({ onEditRequirement }: ListPageProps) {
     e.target.value = "";
   }, []);
 
+  const isEmptyPool = allRequirements.length === 0;
+  const isEmptyFilter = !isEmptyPool && filtered.length === 0;
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold tracking-tight">需求清单</h2>
+    <div className="space-y-4 pt-6">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-display text-2xl font-medium tracking-tight">需求清单</h2>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" className="h-8 text-xs" onClick={handleExport}>
+          <Button size="sm" variant="outline" onClick={handleExport} disabled={isEmptyPool}>
             导出 CSV
           </Button>
-          <Button size="sm" variant="outline" className="h-8 text-xs" onClick={handleImportClick}>
+          <Button size="sm" variant="outline" onClick={handleImportClick}>
             导入 CSV
           </Button>
           <input
@@ -167,24 +171,77 @@ export function ListPage({ onEditRequirement }: ListPageProps) {
             className="hidden"
             onChange={handleFileChange}
           />
-          <span className="text-xs text-muted-foreground tabular-nums">
+          <span className="min-w-[3.5rem] text-right text-xs tabular-nums text-muted-foreground">
             {filtered.length} / {allRequirements.length}
           </span>
         </div>
       </div>
 
-      <FilterBar
-        filters={filters}
-        onChange={setFilters}
-        availableTags={availableTags}
-      />
+      {!isEmptyPool && (
+        <FilterBar
+          filters={filters}
+          onChange={setFilters}
+          availableTags={availableTags}
+        />
+      )}
 
-      <BulkAssignBar onApply={handleBulkApply} />
-
-      <RequirementTable
-        requirements={filtered}
-        onRowClick={onEditRequirement}
-      />
+      {isEmptyPool ? (
+        <div className="flex min-h-[22rem] flex-col items-center justify-center border border-dashed border-border px-6 py-16 text-center">
+          <div
+            role="img"
+            aria-label="空白评估册示意：高低错落的评分条"
+            className="mb-8 flex h-16 w-28 items-end justify-center gap-1.5"
+            style={{ userSelect: "none", pointerEvents: "none" }}
+          >
+            {[28, 52, 36, 64, 20].map((height) => (
+              <div
+                key={height}
+                className="w-3 bg-foreground/15"
+                style={{ height }}
+              />
+            ))}
+          </div>
+          <h3 className="font-display text-xl font-medium tracking-tight text-foreground">
+            还没有评估记录
+          </h3>
+          <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground text-pretty">
+            从单条打分开始评估，或导入已有 CSV。清单会按等级、价值分和置信度排序。
+          </p>
+          <div className="mt-7 flex items-center gap-2">
+            <Button size="sm" onClick={onCreateNew}>
+              去打分
+            </Button>
+            <Button size="sm" variant="outline" onClick={handleImportClick}>
+              导入 CSV
+            </Button>
+          </div>
+        </div>
+      ) : isEmptyFilter ? (
+        <div className="flex min-h-[22rem] flex-col items-center justify-center border border-dashed border-border px-6 py-16 text-center">
+          <h3 className="font-display text-xl font-medium tracking-tight text-foreground">
+            没有符合筛选条件的需求
+          </h3>
+          <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground text-pretty">
+            试试去掉关键词或筛选条件，当前筛选结果为空。
+          </p>
+          <Button
+            size="sm"
+            variant="outline"
+            className="mt-7"
+            onClick={() => setFilters(EMPTY_FILTERS)}
+          >
+            清除筛选
+          </Button>
+        </div>
+      ) : (
+        <>
+          <BulkAssignBar onApply={handleBulkApply} />
+          <RequirementTable
+            requirements={filtered}
+            onRowClick={onEditRequirement}
+          />
+        </>
+      )}
 
       {importReport && (
         <ImportReportDialog

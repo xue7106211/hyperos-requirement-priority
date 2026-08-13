@@ -8,7 +8,7 @@ describe("RequirementForm", () => {
   it("修改维度分后实时面板分数更新", async () => {
     render(<RequirementForm initial={undefined} config={DEFAULT_CONFIG} onSave={()=>{}} />);
     // 六维全给 4（各维找到 ScoreSelector 的 "4" 按钮点击）
-    screen.getAllByText("4").forEach(btn => fireEvent.click(btn));
+    screen.getAllByRole("radio", { name: /^4：/ }).forEach((btn) => fireEvent.click(btn));
     // With all dimensions at 4 and default weights summing to 100,
     // valueScore = 100. LiveResultPanel renders it as "100.0" via .toFixed(1)
     expect(screen.getByText("100.0")).toBeInTheDocument();
@@ -22,6 +22,13 @@ describe("RequirementForm", () => {
     await waitFor(() => {
       expect(screen.getByText(/直升/)).toBeInTheDocument();
     });
+  });
+  it("展示维度判断说明，便于对照打分", () => {
+    render(<RequirementForm initial={undefined} config={DEFAULT_CONFIG} onSave={() => {}} />);
+    expect(
+      screen.getByText(/判断需求是否承接 HyperOS 战略/)
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("查看 0–4 分标准")).toHaveLength(6);
   });
   it("默认置信度为「中」且面板显示该值", () => {
     render(<RequirementForm initial={undefined} config={DEFAULT_CONFIG} onSave={() => {}} />);

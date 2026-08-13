@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { DimensionKey, Weights, EscalationTrigger, DimensionScore, Confidence } from "@/domain/types";
 import { DIMENSION_KEYS } from "@/domain/types";
 import { DIMENSION_META, ESCALATION_META } from "@/domain/modelConfig";
@@ -13,10 +13,6 @@ interface LiveResultPanelProps {
   confidence: Confidence;
 }
 
-/**
- * 实时评级面板 - sticky 侧栏,显示等级/总分/各维贡献/归一化提示。
- * 设计基调: A 克制精密 — 中性灰、方形、锐利层级、微妙动效。
- */
 export function LiveResultPanel({
   result,
   scores,
@@ -24,9 +20,15 @@ export function LiveResultPanel({
   escalationTrigger,
   confidence,
 }: LiveResultPanelProps) {
+  const reduceMotion = useReducedMotion();
+  const fade = {
+    initial: reduceMotion ? false : { opacity: 0, y: 6 },
+    animate: { opacity: 1, y: 0 },
+    exit: reduceMotion ? { opacity: 1 } : { opacity: 0, y: -6 },
+    transition: { duration: reduceMotion ? 0 : 0.22, ease: [0.32, 0.72, 0, 1] as const },
+  };
   const isEscalated = escalationTrigger !== null || result.valueScore === null;
 
-  // 计算各维贡献分: score/4 * 归一化权重占比
   const totalWeight = Object.values(result.weightsSnapshot).reduce((s, w) => s + w, 0);
   const contributions = DIMENSION_KEYS.map((key) => {
     const dimScore = scores[key]?.score ?? 0;
@@ -38,105 +40,85 @@ export function LiveResultPanel({
       contribution: Math.round(contribution * 10) / 10,
     };
   });
+  const maxContribution = Math.max(...contributions.map((c) => c.contribution), 1);
+
+  const scoreLabel =
+    result.valueScore !== null ? result.valueScore.toFixed(1) : "—";
 
   return (
-    <aside className="sticky top-8 space-y-6 rounded-sm border border-neutral-200 bg-white p-6">
-      {/* 等级区 */}
-      <div className="flex items-center gap-3">
+    <aside
+      aria-live="polite"
+      className="sticky top-[calc(var(--header-height)+0.75rem)] min-h-[24rem] border border-border bg-card p-7 shadow-raised"
+    >
+      <p className="font-latin text-[11px] italic tracking-[0.18em] text-muted-foreground">
+        Grade
+      </p>
+
+      <div className="mt-3 flex items-end gap-4">
         <AnimatePresence mode="wait">
-          <motion.div
-            key={result.grade}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-          >
-            <GradeBadge grade={result.grade} />
+          <motion.div key={result.grade} {...fade}>
+            <GradeBadge grade={result.grade} size="display" />
           </motion.div>
         </AnimatePresence>
-        <span className="text-xs text-neutral-400 tracking-wide">
-          等级
-        </span>
+        <span className="mb-1 text-xs tracking-wide text-muted-foreground">等级</span>
       </div>
 
-      {/* 分数/直升区 */}
-      <div className="border-t border-neutral-100 pt-4">
+      <div className="mt-6 border-t border-border/80 pt-5">
         <AnimatePresence mode="wait">
           {isEscalated ? (
-            <motion.div
-              key="escalated"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-1"
-            >
-              <p className="text-lg font-semibold text-neutral-900 tracking-tight">
+            <motion.div key="escalated" {...fade} className="min-h-[4.75rem] space-y-1">
+              <p className="font-display text-xl font-medium leading-snug tracking-tight text-foreground">
                 直升 · {escalationTrigger ? ESCALATION_META[escalationTrigger].label : "—"}
               </p>
-              <p className="text-xs text-neutral-400">
-                触发直升条件,跳过六维评分
-              </p>
+              <p className="text-xs text-muted-foreground">触发直升条件，跳过六维评分</p>
             </motion.div>
           ) : (
-            <motion.div
-              key="scored"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-1"
-            >
-              <p className="text-2xl font-bold text-neutral-900 tabular-nums tracking-tight">
-                {result.valueScore !== null
-                  ? Number.isInteger(result.valueScore)
-                    ? result.valueScore.toFixed(1)
-                    : result.valueScore
-                  : "—"}
+            <motion.div key="scored" {...fade} className="min-h-[4.75rem] space-y-1">
+              <p className="font-latin min-w-[4.5rem] text-[2.35rem] leading-none tabular-nums tracking-tight text-foreground">
+                {scoreLabel}
               </p>
-              <p className="text-xs text-neutral-400">
-                价值总分
-              </p>
+              <p className="text-xs text-muted-foreground">价值总分</p>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* 各维贡献 */}
       {!isEscalated && (
-        <div className="border-t border-neutral-100 pt-4 space-y-2">
-          <p className="text-xs font-medium text-neutral-500 tracking-wide mb-2">
+        <div className="mt-5 space-y-3 border-t border-border/80 pt-5">
+          <p className="text-[11px] font-medium tracking-[0.16em] text-muted-foreground">
             各维贡献
           </p>
           {contributions.map((dim) => (
-            <div
-              key={dim.key}
-              className="flex items-center justify-between text-sm"
-            >
-              <span className="text-neutral-600 truncate mr-2">
-                {dim.label}
-              </span>
-              <span className="text-neutral-900 font-medium tabular-nums shrink-0">
-                {dim.contribution.toFixed(1)}
-              </span>
+            <div key={dim.key} className="space-y-1">
+              <div className="flex items-baseline justify-between gap-3 text-sm">
+                <span className="truncate text-foreground/80">{dim.label}</span>
+                <span className="w-10 shrink-0 text-right font-medium tabular-nums text-foreground">
+                  {dim.contribution.toFixed(1)}
+                </span>
+              </div>
+              <div className="h-px overflow-hidden bg-border">
+                <div
+                  className="h-full origin-left bg-foreground transition-transform duration-150 ease-out"
+                  style={{ transform: `scaleX(${dim.contribution / maxContribution})` }}
+                />
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* 归一化提示 */}
       {result.wasNormalized && (
-        <div className="border-t border-neutral-100 pt-3">
-          <p className="text-xs text-neutral-400">
-            已按比例归一化
-          </p>
+        <div className="mt-5 border-t border-border/80 pt-3">
+          <p className="text-xs text-muted-foreground">已按比例归一化</p>
         </div>
       )}
 
-      {/* 置信度 */}
-      <div className="border-t border-neutral-100 pt-3">
-        <p className="text-xs text-neutral-400 tracking-wide">
-          置信度 <span data-testid="confidence-display" className="text-neutral-600 font-medium">{confidence}</span>
+      <div className="mt-5 border-t border-border/80 pt-3">
+        <p className="text-xs tracking-wide text-muted-foreground">
+          置信度{" "}
+          <span data-testid="confidence-display" className="font-medium text-foreground">
+            {confidence}
+          </span>
         </p>
       </div>
     </aside>

@@ -67,14 +67,24 @@ export function RequirementTable({ requirements, onRowClick }: RequirementTableP
         {sorted.map((req, idx) => (
           <TableRow
             key={req.id}
-            className="cursor-pointer"
+            tabIndex={0}
+            aria-label={`查看 ${req.name || "未命名需求"}`}
+            className="h-11 cursor-pointer focus-visible:bg-muted/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-inset"
             onClick={() => onRowClick(req)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onRowClick(req);
+              }
+            }}
           >
             <TableCell className="text-muted-foreground tabular-nums">
               {idx + 1}
             </TableCell>
-            <TableCell className="font-medium">{req.name}</TableCell>
-            <TableCell className="text-muted-foreground text-xs">
+            <TableCell className="max-w-[16rem] truncate font-medium">
+              {req.name || "未命名需求"}
+            </TableCell>
+            <TableCell className="text-xs text-muted-foreground">
               {req.mainCategory}
             </TableCell>
             <TableCell>
@@ -84,7 +94,7 @@ export function RequirementTable({ requirements, onRowClick }: RequirementTableP
               {req.valueScore === null ? (
                 <span className="text-xs text-muted-foreground">直升</span>
               ) : (
-                req.valueScore
+                req.valueScore.toFixed(1)
               )}
             </TableCell>
             <TableCell className="text-xs">{req.confidence}</TableCell>

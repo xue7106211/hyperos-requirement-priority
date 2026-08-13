@@ -5,7 +5,7 @@ import { ScoreSelector } from "@/components/ScoreSelector";
 describe("ScoreSelector", () => {
   it("渲染 5 个档位按钮", () => {
     render(<ScoreSelector value={2} onChange={()=>{}} anchors={["0","1","2","3","4"]} />);
-    expect(screen.getAllByRole("button")).toHaveLength(5);
+    expect(screen.getAllByRole("radio")).toHaveLength(5);
   });
   it("点击某档触发 onChange 对应值", () => {
     const fn = vi.fn();

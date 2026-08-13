@@ -13,9 +13,16 @@ export const DEFAULT_CONFIG: ModelConfig = {
   weights: DEFAULT_WEIGHTS, thresholds: DEFAULT_THRESHOLDS,
 };
 
-export const DIMENSION_META: Record<DimensionKey, { label: string; anchors: string[] }> = {
+export const DIMENSION_META: Record<DimensionKey, {
+  label: string;
+  hint: string;
+  caution: string;
+  anchors: string[];
+}> = {
   strategy: {
     label: "战略与未来确定性",
+    hint: "判断需求是否承接 HyperOS 战略、下一代确定性体验或明确产品窗口。",
+    caution: "不能仅因描述中出现「下一代」「战略」「高端」等词打高分。",
     anchors: [
       "与产品战略、未来能力和版本目标无明显关系",
       "符合宽泛方向，但没有明确路线、业务或产品窗口",
@@ -26,6 +33,8 @@ export const DIMENSION_META: Record<DimensionKey, { label: string; anchors: stri
   },
   userProblem: {
     label: "用户问题与风险",
+    hint: "判断问题严重度、发生频率、不满意度贡献，以及可能带来的品牌或舆情风险。",
+    caution: "「专家认为不好」主要用于提高置信度，不等于用户价值自动升高。",
     anchors: [
       "没有明确用户问题，仅为主观偏好",
       "个别场景或少量用户反馈，不影响核心任务",
@@ -36,6 +45,8 @@ export const DIMENSION_META: Record<DimensionKey, { label: string; anchors: stri
   },
   systemImpact: {
     label: "系统影响面",
+    hint: "判断需求覆盖范围、出现频率，以及是否影响系统的基本美学或交互面貌。",
+    caution: "业务方数量只是范围证据，不能直接等价为高分。",
     anchors: [
       "一次性、局部、极低频场景",
       "单应用或单组件中的边缘场景",
@@ -46,6 +57,8 @@ export const DIMENSION_META: Record<DimensionKey, { label: string; anchors: stri
   },
   leverage: {
     label: "体系杠杆价值",
+    hint: "判断需求能否沉淀为可复用的设计系统能力，并降低未来重复建设成本。",
+    caution: "「Token 先行」不是天然高价值，需能形成语义约束或减少重复建设。",
     anchors: [
       "完全定制化，只解决当前页面问题",
       "可形成局部规范，但复用范围有限",
@@ -56,6 +69,8 @@ export const DIMENSION_META: Record<DimensionKey, { label: string; anchors: stri
   },
   deviceEnable: {
     label: "设备与生态赋能",
+    hint: "判断需求是否支撑新机、新形态、多端体验和未来设备能力。",
+    caution: "「新机适配」只是标签；只有决定新设备核心体验时才打 3–4 分。",
     anchors: [
       "与设备形态和多端体验无关",
       "只涉及轻量尺寸或样式适配",
@@ -66,6 +81,8 @@ export const DIMENSION_META: Record<DimensionKey, { label: string; anchors: stri
   },
   competitive: {
     label: "竞争价值",
+    hint: "判断需求是在补齐关键能力缺口，还是能形成可感知、可持续的领先能力。",
+    caution: "友商已有不代表补齐后自动高分；须记录对比范围、版本与日期。",
     anchors: [
       "与竞争能力无明显关系",
       "友商存在类似实现，但该能力并非关键差距",

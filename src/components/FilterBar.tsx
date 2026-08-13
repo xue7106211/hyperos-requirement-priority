@@ -8,8 +8,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-/* ─── Filters 类型 ─── */
-
 export interface Filters {
   keyword: string;
   mainCategory: MainCategory | "";
@@ -26,8 +24,6 @@ export const EMPTY_FILTERS: Filters = {
   tag: "",
 };
 
-/* ─── 组件 ─── */
-
 interface FilterBarProps {
   filters: Filters;
   onChange: (filters: Filters) => void;
@@ -39,20 +35,22 @@ export function FilterBar({ filters, onChange, availableTags = [] }: FilterBarPr
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {/* 关键词搜索 */}
       <Input
-        placeholder="搜索需求名..."
+        type="search"
+        autoComplete="off"
+        spellCheck={false}
+        placeholder="搜索需求名…"
         value={filters.keyword}
         onChange={(e) => update({ keyword: e.target.value })}
         className="w-48 rounded-sm"
+        aria-label="搜索需求名"
       />
 
-      {/* 主类型 */}
       <Select
         value={filters.mainCategory || "__all__"}
         onValueChange={(v) => update({ mainCategory: v === "__all__" ? "" : v as MainCategory })}
       >
-        <SelectTrigger className="w-28 rounded-sm">
+        <SelectTrigger className="w-28 rounded-sm" aria-label="主类型">
           <SelectValue placeholder="主类型" />
         </SelectTrigger>
         <SelectContent>
@@ -63,12 +61,11 @@ export function FilterBar({ filters, onChange, availableTags = [] }: FilterBarPr
         </SelectContent>
       </Select>
 
-      {/* 等级 */}
       <Select
         value={filters.grade || "__all__"}
         onValueChange={(v) => update({ grade: v === "__all__" ? "" : v as Grade })}
       >
-        <SelectTrigger className="w-24 rounded-sm">
+        <SelectTrigger className="w-24 rounded-sm" aria-label="等级">
           <SelectValue placeholder="等级" />
         </SelectTrigger>
         <SelectContent>
@@ -80,12 +77,11 @@ export function FilterBar({ filters, onChange, availableTags = [] }: FilterBarPr
         </SelectContent>
       </Select>
 
-      {/* 置信度 */}
       <Select
         value={filters.confidence || "__all__"}
         onValueChange={(v) => update({ confidence: v === "__all__" ? "" : v as Confidence })}
       >
-        <SelectTrigger className="w-24 rounded-sm">
+        <SelectTrigger className="w-24 rounded-sm" aria-label="置信度">
           <SelectValue placeholder="置信度" />
         </SelectTrigger>
         <SelectContent>
@@ -96,13 +92,12 @@ export function FilterBar({ filters, onChange, availableTags = [] }: FilterBarPr
         </SelectContent>
       </Select>
 
-      {/* 标签 */}
       {availableTags.length > 0 && (
         <Select
           value={filters.tag || "__all__"}
           onValueChange={(v) => update({ tag: v === "__all__" ? "" : v })}
         >
-          <SelectTrigger className="w-28 rounded-sm">
+          <SelectTrigger className="w-28 rounded-sm" aria-label="标签">
             <SelectValue placeholder="标签" />
           </SelectTrigger>
           <SelectContent>
