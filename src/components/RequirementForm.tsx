@@ -262,43 +262,6 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
           </div>
         </section>
 
-        {/* ── 第 0 层 直升 ──────────────────────────────────────────────── */}
-        <section className="space-y-3">
-          <h2 className="text-sm font-medium tracking-wide text-muted-foreground">
-            第 0 层 · 直升判定
-          </h2>
-          <div className="space-y-2" role="radiogroup" aria-label="直升条件">
-            {ESCALATION_OPTIONS.map((opt) => {
-              const isSelected =
-                opt.value === draft.escalationTrigger;
-              const inputId = `esc-${opt.value ?? "none"}`;
-              return (
-                <label
-                  key={opt.value ?? "none"}
-                  htmlFor={inputId}
-                  className={cn(
-                    "flex min-h-10 items-center gap-3 rounded-sm border px-3 py-2.5 text-sm cursor-pointer transition-[border-color,background-color] duration-150 ease-out",
-                    isSelected
-                      ? "border-foreground bg-muted"
-                      : "border-border hover:border-foreground/30"
-                  )}
-                >
-                  <input
-                    type="radio"
-                    id={inputId}
-                    name="escalation"
-                    checked={isSelected}
-                    onChange={() => updateField("escalationTrigger", opt.value)}
-                    className="accent-foreground"
-                    aria-label={opt.label}
-                  />
-                  <span className="text-foreground/80">{opt.label}</span>
-                </label>
-              );
-            })}
-          </div>
-        </section>
-
         {/* ── 六维打分 ─────────────────────────────────────────────────── */}
         <section
           className={cn(
@@ -370,6 +333,43 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
               </div>
             );
           })}
+        </section>
+
+        {/* ── 第 0 层 直升 ──────────────────────────────────────────────── */}
+        <section className="space-y-3">
+          <h2 className="text-sm font-medium tracking-wide text-muted-foreground">
+            第 0 层 · 直升判定
+          </h2>
+          <div className="space-y-2" role="radiogroup" aria-label="直升条件">
+            {ESCALATION_OPTIONS.map((opt) => {
+              const isSelected =
+                opt.value === draft.escalationTrigger;
+              const inputId = `esc-${opt.value ?? "none"}`;
+              return (
+                <label
+                  key={opt.value ?? "none"}
+                  htmlFor={inputId}
+                  className={cn(
+                    "flex min-h-10 items-center gap-3 rounded-sm border px-3 py-2.5 text-sm cursor-pointer transition-[border-color,background-color] duration-150 ease-out",
+                    isSelected
+                      ? "border-foreground bg-muted"
+                      : "border-border hover:border-foreground/30"
+                  )}
+                >
+                  <input
+                    type="radio"
+                    id={inputId}
+                    name="escalation"
+                    checked={isSelected}
+                    onChange={() => updateField("escalationTrigger", opt.value)}
+                    className="accent-foreground"
+                    aria-label={opt.label}
+                  />
+                  <span className="text-foreground/80">{opt.label}</span>
+                </label>
+              );
+            })}
+          </div>
         </section>
 
         {/* ── 错误提示 ─────────────────────────────────────────────────── */}
