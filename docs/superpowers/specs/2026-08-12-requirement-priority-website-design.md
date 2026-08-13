@@ -1,9 +1,10 @@
 # HyperOS 需求价值评估网站 · 设计文档
 
 - 日期：2026-08-12
-- 状态：待用户审阅
+- 状态：一期已按本文档实现；与代码不一致处见第 14 节「实现对照」。v2.0 模型文档仍为草案。
 - 依据模型：`docs/requirement-value-model-v2.md`（v2.0）
 - 关联约束：`AGENTS.md`
+- 文档入口：`docs/index.md`、`README.md`
 
 ## 1. 目标与范围
 
@@ -21,7 +22,8 @@
 
 - 后端、数据库、用户登录、权限（纯前端 + 浏览器本地存储）
 - 外部数据自动匹配（满意度调研 / PV·UV / 舆情），全部人工填写
-- UI 组件的自动化测试（靠手动验收）
+
+设计阶段曾写「UI 组件不做自动化测试」。实现时已补充 `src/components/__tests__/` 与 `src/__tests__/App.test.tsx`，以代码为准。
 
 ## 2. 关键决策记录
 
@@ -38,7 +40,7 @@
 
 ## 3. 整体架构（三层分离）
 
-核心原则（`AGENTS.md:37-38`）：评分逻辑封装为纯函数，UI 只负责展示。
+核心原则（`AGENTS.md`「开发规范」）：评分逻辑封装为纯函数，UI 只负责展示。
 
 ```
 UI 层 (React + shadcn/ui)          收集输入、展示结果、触发操作
@@ -119,7 +121,7 @@ interface Requirement {
 
 **设计要点：**
 
-- `weightsSnapshot` / `thresholdsSnapshot`：权重和阈值可调，每条记录冻结当时配置，保证历史结果可复现（`AGENTS.md:24`）。
+- `weightsSnapshot` / `thresholdsSnapshot`：权重和阈值可调，每条记录冻结当时配置，保证历史结果可复现（`AGENTS.md`「需求模型约束」）。
 - `valueScore: number | null`：命中直升的需求未算分，存 `null`，列表显示“直升 · 原因”，不虚构分数。
 - `Record<DimensionKey, DimensionScore>`：强制六维齐全，漏一个 TS 报错。
 
@@ -132,19 +134,27 @@ src/
 │   ├── scoring.ts             # 六维加权算价值分
 │   ├── grading.ts             # 价值分 → 等级（阈值可调）
 │   ├── escalation.ts          # 第 0 层直升判定
-│   ├── validation.ts          # 校验
+│   ├── validation.ts          # 校验（表单保存时调用）
+│   ├── evaluate.ts            # 编排：直升 → 算分 → 判级
 │   ├── csv.ts                 # CSV 导入导出
 │   ├── modelConfig.ts         # 默认权重/阈值/维度锚点文案
-│   └── __tests__/             # 领域层单测
+│   └── __tests__/             # 领域层单测（含 storage 测试）
 ├── store/
 │   └── storage.ts             # localStorage 封装
 ├── components/
 │   ├── ui/                    # shadcn/ui 组件
-│   └── ...                    # 业务组件
+│   ├── SettingsPanel.tsx      # 高级设置（App Dialog，不是独立页）
+│   ├── RequirementForm.tsx
+│   ├── LiveResultPanel.tsx
+│   ├── ScoreSelector.tsx
+│   ├── GradeBadge.tsx
+│   ├── FilterBar.tsx
+│   ├── RequirementTable.tsx
+│   ├── BulkAssignBar.tsx
+│   └── ImportReportDialog.tsx
 ├── pages/
 │   ├── ScoringPage.tsx        # 单条打分
-│   ├── ListPage.tsx           # 批量清单
-│   └── SettingsPanel.tsx      # 高级设置
+│   └── ListPage.tsx           # 批量清单
 ├── App.tsx
 └── main.tsx
 ```
@@ -158,9 +168,10 @@ src/
 ```
 evaluate(requirement, config)
   ├─ 1. escalation 判定 ── 命中 → 直接返回 {grade, valueScore: null}
-  ├─ 2. validation 校验 ── 不合法 → 返回错误，不计算
-  ├─ 3. scoring 算价值分 → valueScore (0-100)
-  └─ 4. grading 判等级   → grade
+  ├─ 2. scoring 算价值分 → valueScore (0-100)
+  └─ 3. grading 判等级   → grade
+
+validate(requirement)          # 不在 evaluate 内部；表单保存时调用
 ```
 
 直升命中即 return（卫语句），后续不执行——UI 上表现为六维打分区淡出/禁用。
@@ -180,7 +191,7 @@ function assignGrade(
   thresholds: { S: number; A: number; B: number }
 ): Grade;    // >=S→S; >=A→A; >=B→B; else C
 
-function validate(req: Requirement, weights): ValidationResult;
+function validate(req: Requirement): ValidationResult;
 ```
 
 ### 6.3 边界处理（测试重点）
@@ -233,7 +244,7 @@ function validate(req: Requirement, weights): ValidationResult;
 
 ## 9. 测试策略
 
-工具：Vitest（Vite 原生集成）。一期只测领域层纯函数。
+工具：Vitest（Vite 原生集成，`npm run test` = `vitest run`）。领域层纯函数为必测范围；实现后同时覆盖部分 UI 组件与 `App` 外壳。
 
 **必测边界值（来自 v2.0 第 12 节）：**
 
@@ -257,14 +268,14 @@ function validate(req: Requirement, weights): ValidationResult;
 ## 11. 交付前验证
 
 ```
-1. npm run test    领域层单测全绿（边界值）
-2. npm run build   类型检查 + 构建通过（tsc 无 error）
+1. npm run test    领域层与已有 UI 测试全绿
+2. npm run build   类型检查 + 构建通过（tsc -b && vite build）
 3. 手动走 v2.0 第 12 节 10 个验收案例，逐条对照预期等级
 ```
 
 ## 12. AGENTS.md 一致性（已解决）
 
-本设计选择“权重自动归一化”。`AGENTS.md:41` 已同步修改为“权重总和不为 100% 时按比例自动归一化并提示”，与本文档和 v2.0 第 4.2 节一致。无遗留冲突。
+本设计选择“权重自动归一化”。`AGENTS.md`「开发规范」已写明“权重总和不为 100% 时按比例自动归一化并提示”，与本文档和 v2.0 第 4.2 节一致。无遗留冲突。
 
 ## 13. 技术栈清单
 
@@ -275,3 +286,15 @@ function validate(req: Requirement, weights): ValidationResult;
 - 测试：Vitest
 - 存储：localStorage
 - 无后端、无数据库、无认证
+
+## 14. 实现对照（2026-08-13 文档同步）
+
+以下以当前 `src/` 为准，避免把设计稿未落地的细节写成产品能力：
+
+- `evaluate` 不调用 `validate`；硬错误/缺理由提醒发生在 `RequirementForm` 保存时。
+- 直升条件在表单里是单选。模型文档写「命中多条取最高等级」，当前 UI 与 `checkEscalation(trigger)` 一次只处理一个条件。
+- 打分页展示：需求名称、主类型、二级标签、置信度、直升、六维分数与理由。v2.0 第 11 节其余字段（描述、问题陈述、场景、证据等）存在于类型默认值和 CSV 列，表单未提供输入。
+- 列表「仍为预设 / 已人工调整」来自 `manuallyAdjusted`：批量赋值会打上该标记；「重置为预设」按钮已从实现中移除。
+- `src/components/ui/slider.tsx`、`switch.tsx`、`card.tsx` 已安装，业务页面未引用。
+- `index.html` 引用 `/favicon.svg`，仓库中未找到该文件。
+- 无 CI、无 README 之外的部署流水线；静态托管仍是设计决策，仓库内未配置托管目标。

@@ -1,5 +1,7 @@
 # HyperOS 设计系统需求价值分级标准 v1.0
 
+> 本文档为 **v1.0 历史存档**。当前网站与 Agent 约定以 [`requirement-value-model-v2.md`](./requirement-value-model-v2.md) 为准，不要用本文档指导新评估或新代码。
+
 ## 1. 文档目的
 
 本标准用于评估和统计 HyperOS 设计系统相关需求的价值等级，为版本规划、资源分配和长期能力建设提供统一依据。

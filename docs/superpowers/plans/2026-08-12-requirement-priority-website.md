@@ -1,12 +1,14 @@
 # HyperOS 需求价值评估网站 Implementation Plan
 
+> **状态（2026-08-13 文档同步）：** 一期实现已合入 `main`。本文档保留为实施记录，任务清单未回写勾选，完成度以 git 提交历史为准。日常开发请以 `README.md`、`AGENTS.md`、`docs/index.md` 为准。
+>
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 构建一个纯前端的 HyperOS 需求价值评估网站，按 v2.0 模型给需求打分、定 S/A/B/C 等级、筛选统计、CSV 导入导出。
 
-**Architecture:** 三层分离——UI 层（React + shadcn/ui）只负责展示，领域层（纯 TS 函数，零 React 依赖）承载全部评分/等级/直升/校验逻辑，持久层用 localStorage。数据流为单向：用户打分 → 直升判定 → 算分 → 判级 → 存储 → 渲染。
+**Architecture:** 三层分离——UI 层（React + shadcn/ui）只负责展示，领域层（纯 TS 函数，零 React 依赖）承载全部评分/等级/直升/校验逻辑，持久层用 localStorage。数据流为单向：用户打分 → 直升判定 → 算分 → 判级 → 存储 → 渲染。校验在表单保存时调用，不在 `evaluate` 内部。
 
-**Tech Stack:** Vite + React 18 + TypeScript + shadcn/ui（Radix + Tailwind CSS）+ Framer Motion（克制使用）+ Vitest。无后端、无数据库、无认证。
+**Tech Stack:** Vite + React 18 + TypeScript + shadcn/ui（Radix + Tailwind CSS）+ Framer Motion（克制使用）+ Vitest。包管理器为 npm。无后端、无数据库、无认证。命令见 `README.md`。
 
 ## Global Constraints
 
@@ -15,7 +17,7 @@
 - 默认权重（%）：strategy 23、userProblem 17、systemImpact 20、leverage 18、deviceEnable 12、competitive 10，合计 100。
 - 默认阈值：S≥85、A≥70、B≥50、C<50。
 - 等级判定用未取整分数，边界用 `>=`（85 属 S）。
-- 权重合计 ≠ 100% 时按比例自动归一化并提示（`AGENTS.md:41`）。
+- 权重合计 ≠ 100% 时按比例自动归一化并提示（`AGENTS.md`「开发规范」）。
 - 命中直升的需求 `valueScore` 存 `null`，跳过六维打分，命中多条取最高等级（S>A）。
 - 每条评估记录冻结 `modelVersion`、`weightsSnapshot`、`thresholdsSnapshot`、`evaluatedAt`，保证可复现。
 - 标签数量不改变分数。相同输入 + 相同 config → 结果完全一致。
@@ -34,7 +36,7 @@
 - `src/domain/scoring.ts` — 六维加权算价值分（含归一化）
 - `src/domain/grading.ts` — 价值分 → 等级
 - `src/domain/validation.ts` — 输入校验
-- `src/domain/evaluate.ts` — 总入口：编排直升→校验→算分→判级
+- `src/domain/evaluate.ts` — 总入口：编排直升→算分→判级
 - `src/domain/csv.ts` — CSV 导入导出
 - `src/domain/__tests__/*.test.ts` — 领域层单测
 
@@ -51,6 +53,8 @@ UI 层：
 - `src/components/RequirementTable.tsx` — 批量清单表格
 - `src/components/FilterBar.tsx` — 筛选栏
 - `src/components/SettingsPanel.tsx` — 高级设置
+- `src/components/BulkAssignBar.tsx` — 批量赋值
+- `src/components/ImportReportDialog.tsx` — CSV 导入报告
 - `src/pages/ScoringPage.tsx` / `ListPage.tsx`
 - `src/App.tsx` / `src/main.tsx` / `index.html`
 
