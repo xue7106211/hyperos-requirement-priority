@@ -1,5 +1,5 @@
-import { useState } from "react";
-import type { DimensionKey } from "@/domain/types";
+import { useMemo, useState } from "react";
+import type { DimensionKey, ScoreValue } from "@/domain/types";
 import { DIMENSION_KEYS } from "@/domain/types";
 import { DIMENSION_META } from "@/domain/modelConfig";
 import {
@@ -12,14 +12,29 @@ import {
 import { Button } from "@/components/ui/button";
 
 interface BulkAssignBarProps {
-  onApply: (dim: DimensionKey, score: 0 | 1 | 2 | 3 | 4) => void;
+  onApply: (dim: DimensionKey, score: ScoreValue) => void;
 }
-
-const SCORE_OPTIONS: Array<0 | 1 | 2 | 3 | 4> = [0, 1, 2, 3, 4];
 
 export function BulkAssignBar({ onApply }: BulkAssignBarProps) {
   const [dimension, setDimension] = useState<DimensionKey>(DIMENSION_KEYS[0]);
-  const [score, setScore] = useState<0 | 1 | 2 | 3 | 4>(0);
+  const [score, setScore] = useState<ScoreValue>(0);
+
+  // 各维度满分不同（设备与生态赋能为 0–3），可选档位随维度变化
+  const scoreOptions = useMemo(
+    () =>
+      Array.from(
+        { length: DIMENSION_META[dimension].maxScore + 1 },
+        (_, i) => i as ScoreValue
+      ),
+    [dimension]
+  );
+
+  // 切换到档位更少的维度时，把越界的已选分数收敛到新满分
+  const handleDimensionChange = (next: DimensionKey) => {
+    setDimension(next);
+    const max = DIMENSION_META[next].maxScore;
+    if (score > max) setScore(max as ScoreValue);
+  };
 
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-muted/70 px-3 py-2">
@@ -27,7 +42,7 @@ export function BulkAssignBar({ onApply }: BulkAssignBarProps) {
 
       <Select
         value={dimension}
-        onValueChange={(v) => setDimension(v as DimensionKey)}
+        onValueChange={(v) => handleDimensionChange(v as DimensionKey)}
       >
         <SelectTrigger className="h-9 w-[160px] text-sm" aria-label="批量赋值维度">
           <SelectValue placeholder="选择维度" />
@@ -43,13 +58,13 @@ export function BulkAssignBar({ onApply }: BulkAssignBarProps) {
 
       <Select
         value={String(score)}
-        onValueChange={(v) => setScore(Number(v) as 0 | 1 | 2 | 3 | 4)}
+        onValueChange={(v) => setScore(Number(v) as ScoreValue)}
       >
         <SelectTrigger className="h-9 w-[72px] text-sm tabular-nums" aria-label="批量赋值分数">
           <SelectValue placeholder="分数" />
         </SelectTrigger>
         <SelectContent>
-          {SCORE_OPTIONS.map((s) => (
+          {scoreOptions.map((s) => (
             <SelectItem key={s} value={String(s)} className="text-sm tabular-nums">
               {s} 分
             </SelectItem>

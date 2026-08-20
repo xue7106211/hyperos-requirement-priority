@@ -1,4 +1,4 @@
-import type { Requirement, Grade, Confidence } from "@/domain/types";
+import type { Requirement, Grade } from "@/domain/types";
 import { GradeBadge } from "@/components/GradeBadge";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,10 +13,9 @@ import {
 /* ─── 排序逻辑 ─── */
 
 const GRADE_ORDER: Record<Grade, number> = { S: 0, A: 1, B: 2, C: 3 };
-const CONFIDENCE_ORDER: Record<Confidence, number> = { "高": 0, "中": 1, "低": 2 };
 
 /**
- * 默认排序：等级(S>A>B>C) → 价值分降序(null/直升视为最高) → 置信度(高>中>低) → 评估时间升序
+ * 默认排序：等级(S>A>B>C) → 价值分降序(null/直升视为最高) → 评估时间升序
  */
 export function sortRequirements(reqs: Requirement[]): Requirement[] {
   return [...reqs].sort((a, b) => {
@@ -30,12 +29,7 @@ export function sortRequirements(reqs: Requirement[]): Requirement[] {
     const scoreB = b.valueScore === null ? Infinity : b.valueScore;
     if (scoreA !== scoreB) return scoreB - scoreA; // 降序
 
-    // 3. 置信度 高>中>低
-    const confA = CONFIDENCE_ORDER[a.confidence] ?? 3;
-    const confB = CONFIDENCE_ORDER[b.confidence] ?? 3;
-    if (confA !== confB) return confA - confB;
-
-    // 4. 评估时间升序
+    // 3. 评估时间升序
     return (a.evaluatedAt || "").localeCompare(b.evaluatedAt || "");
   });
 }
@@ -60,7 +54,6 @@ export function RequirementTable({ requirements, onRowClick }: RequirementTableP
             <TableHead className="w-24">主类型</TableHead>
             <TableHead className="w-16">等级</TableHead>
             <TableHead className="w-20">价值分</TableHead>
-            <TableHead className="w-16">置信度</TableHead>
             <TableHead className="w-20">状态</TableHead>
           </TableRow>
         </TableHeader>
@@ -98,7 +91,6 @@ export function RequirementTable({ requirements, onRowClick }: RequirementTableP
                   req.valueScore.toFixed(1)
                 )}
               </TableCell>
-              <TableCell className="text-xs">{req.confidence}</TableCell>
               <TableCell>
                 <Badge
                   variant="secondary"

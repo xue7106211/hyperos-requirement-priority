@@ -6,7 +6,6 @@ import type {
   DimensionKey,
   DimensionScore,
   EscalationTrigger,
-  Confidence,
 } from "@/domain/types";
 import { DIMENSION_KEYS } from "@/domain/types";
 import { DIMENSION_META, ESCALATION_META, MODEL_VERSION } from "@/domain/modelConfig";
@@ -47,8 +46,6 @@ const ESCALATION_OPTIONS: { value: EscalationTrigger; label: string }[] = [
   })),
 ];
 
-const CONFIDENCE_OPTIONS: Confidence[] = ["高", "中", "低"];
-
 function createEmptyScores(): Record<DimensionKey, DimensionScore> {
   const scores = {} as Record<DimensionKey, DimensionScore>;
   for (const k of DIMENSION_KEYS) {
@@ -75,7 +72,6 @@ function createDefaultDraft(): Requirement {
     competitiveEvidence: "",
     escalationTrigger: null,
     scores: createEmptyScores(),
-    confidence: "中",
     valueScore: null,
     grade: "C",
     modelVersion: MODEL_VERSION,
@@ -239,26 +235,6 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
                 className="mt-1"
               />
             </div>
-            <div>
-              <Label htmlFor="req-confidence" className="text-xs text-muted-foreground">
-                置信度
-              </Label>
-              <Select
-                value={draft.confidence}
-                onValueChange={(v) => updateField("confidence", v as Confidence)}
-              >
-                <SelectTrigger id="req-confidence" className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CONFIDENCE_OPTIONS.map((opt) => (
-                    <SelectItem key={opt} value={opt}>
-                      {opt}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </div>
         </section>
 
@@ -305,7 +281,7 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
                 </p>
                 <details className="group text-xs text-muted-foreground">
                   <summary className="cursor-pointer select-none tracking-wide transition-colors duration-150 ease-out hover:text-foreground">
-                    查看 0–4 分标准
+                    查看 0–{meta.maxScore} 分标准
                   </summary>
                   <ol className="mt-2 space-y-1 border-l border-border pl-3">
                     {meta.anchors.map((anchor, i) => (
@@ -395,7 +371,6 @@ export function RequirementForm({ initial, config, onSave }: RequirementFormProp
         scores={draft.scores}
         weights={config.weights}
         escalationTrigger={draft.escalationTrigger}
-        confidence={draft.confidence}
       />
 
       {/* Warning dialog */}

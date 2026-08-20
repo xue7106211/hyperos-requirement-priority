@@ -13,8 +13,9 @@ export function validate(req: Requirement): ValidationResult {
   }
   for (const k of DIMENSION_KEYS) {
     const s = req.scores[k].score as number;
-    if (!Number.isInteger(s) || s < 0 || s > 4) {
-      errors.push(`维度「${DIMENSION_META[k].label}」评分越界：${s}`);
+    const max = DIMENSION_META[k].maxScore;
+    if (!Number.isInteger(s) || s < 0 || s > max) {
+      errors.push(`维度「${DIMENSION_META[k].label}」评分越界：${s}（应为 0–${max} 整数）`);
     }
     if (req.escalationTrigger === null && req.scores[k].reason.trim() === "") {
       warnings.push(`维度「${DIMENSION_META[k].label}」缺评分理由`);

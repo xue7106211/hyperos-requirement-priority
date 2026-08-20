@@ -1,13 +1,31 @@
 import { describe, it, expect } from "vitest";
 import { calculateValueScore, normalizeWeights } from "@/domain/scoring";
-import { DEFAULT_WEIGHTS } from "@/domain/modelConfig";
-import type { DimensionKey, DimensionScore } from "@/domain/types";
+import { DEFAULT_WEIGHTS, DIMENSION_META } from "@/domain/modelConfig";
+import { DIMENSION_KEYS } from "@/domain/types";
+import type { DimensionKey, DimensionScore, ScoreValue } from "@/domain/types";
 
-const mk = (n: 0|1|2|3|4): DimensionScore => ({ score: n, reason: "" });
-const all = (n: 0|1|2|3|4): Record<DimensionKey, DimensionScore> => ({
-  strategy: mk(n), userProblem: mk(n), systemImpact: mk(n),
-  leverage: mk(n), deviceEnable: mk(n), competitive: mk(n),
-});
+/** 所有维度给同一个分值（仅用于合法范围内的分值） */
+const all = (n: ScoreValue): Record<DimensionKey, DimensionScore> => {
+  const out = {} as Record<DimensionKey, DimensionScore>;
+  for (const k of DIMENSION_KEYS) out[k] = { score: n, reason: "" };
+  return out;
+};
+
+/** 每个维度按自身满分打满 */
+const full = (): Record<DimensionKey, DimensionScore> => {
+  const out = {} as Record<DimensionKey, DimensionScore>;
+  for (const k of DIMENSION_KEYS) {
+    out[k] = { score: DIMENSION_META[k].maxScore as ScoreValue, reason: "" };
+  }
+  return out;
+};
+
+/** 只有指定维度得分，其余为 0 */
+const only = (key: DimensionKey, score: ScoreValue): Record<DimensionKey, DimensionScore> => {
+  const out = all(0);
+  out[key] = { score, reason: "" };
+  return out;
+};
 
 describe("normalizeWeights", () => {
   it("合计 100 时不改动", () => {
@@ -34,9 +52,27 @@ describe("normalizeWeights", () => {
 });
 
 describe("calculateValueScore", () => {
-  it("全 4 分 = 100.0", () => { expect(calculateValueScore(all(4), DEFAULT_WEIGHTS)).toBe(100.0); });
+  it("各维按自身满分打满 = 100.0", () => {
+    expect(calculateValueScore(full(), DEFAULT_WEIGHTS)).toBe(100.0);
+  });
   it("全 0 分 = 0.0", () => { expect(calculateValueScore(all(0), DEFAULT_WEIGHTS)).toBe(0.0); });
-  it("全 2 分 = 50.0", () => { expect(calculateValueScore(all(2), DEFAULT_WEIGHTS)).toBe(50.0); });
+
+  it("任一维度打满时的贡献恰好等于其权重（与该维档位数无关）", () => {
+    for (const k of DIMENSION_KEYS) {
+      const max = DIMENSION_META[k].maxScore as ScoreValue;
+      expect(calculateValueScore(only(k, max), DEFAULT_WEIGHTS)).toBeCloseTo(DEFAULT_WEIGHTS[k], 6);
+    }
+  });
+
+  it("设备与生态赋能按四档归一：1 分贡献 4.0，2 分贡献 8.0", () => {
+    expect(calculateValueScore(only("deviceEnable", 1), DEFAULT_WEIGHTS)).toBe(4.0);
+    expect(calculateValueScore(only("deviceEnable", 2), DEFAULT_WEIGHTS)).toBe(8.0);
+  });
+
+  it("五档维度仍按 /4 归一：战略 1 分贡献 5.8", () => {
+    expect(calculateValueScore(only("strategy", 1), DEFAULT_WEIGHTS)).toBe(5.8);
+  });
+
   it("结果保留一位小数", () => {
     const v = calculateValueScore(all(3), DEFAULT_WEIGHTS);
     expect(Number.isFinite(v)).toBe(true);

@@ -11,8 +11,8 @@ import type {
   DimensionScore,
   MainCategory,
   EscalationTrigger,
-  Confidence,
   Grade,
+  ScoreValue,
   Weights,
   Thresholds,
 } from "./types";
@@ -21,7 +21,6 @@ import { DIMENSION_META } from "./modelConfig";
 // ─── 列定义 ───────────────────────────────────────────────────────────────────
 
 const VALID_MAIN_CATEGORIES: MainCategory[] = ["平台基建", "适配建设", "体验优化"];
-const VALID_CONFIDENCES: Confidence[] = ["高", "中", "低"];
 const VALID_GRADES: Grade[] = ["S", "A", "B", "C"];
 const VALID_ESCALATION_TRIGGERS: EscalationTrigger[] = [
   "legal", "redOrange", "blockDevice", "hardwareSell", "yellow", null,
@@ -51,7 +50,6 @@ const COLUMNS: string[] = [
   ...DIMENSION_KEYS.map((k) => `${DIMENSION_META[k].label}-分数`),
   // 六维理由
   ...DIMENSION_KEYS.map((k) => `${DIMENSION_META[k].label}-理由`),
-  "置信度",
   "价值分",
   "等级",
   "模型版本",
@@ -96,7 +94,6 @@ export function exportToCsv(reqs: Requirement[]): string {
       ...DIMENSION_KEYS.map((k) => String(r.scores[k].score)),
       // 六维理由
       ...DIMENSION_KEYS.map((k) => r.scores[k].reason),
-      r.confidence,
       r.valueScore === null ? "" : String(r.valueScore),
       r.grade,
       r.modelVersion,
@@ -269,16 +266,17 @@ export function importFromCsv(text: string): {
     const scores: Record<DimensionKey, DimensionScore> = {} as Record<DimensionKey, DimensionScore>;
     for (const dk of DIMENSION_KEYS) {
       const label = DIMENSION_META[dk].label;
+      const max = DIMENSION_META[dk].maxScore;
       const scoreStr = get(`${label}-分数`);
       const scoreNum = Number(scoreStr);
-      if (!Number.isInteger(scoreNum) || scoreNum < 0 || scoreNum > 4) {
+      if (!Number.isInteger(scoreNum) || scoreNum < 0 || scoreNum > max) {
         skipped++;
-        reasons.push(`行${lineNum}: 维度 "${label}" 分数非法 "${scoreStr}" (应为0-4整数)`);
+        reasons.push(`行${lineNum}: 维度 "${label}" 分数非法 "${scoreStr}" (应为0-${max}整数)`);
         scoreError = true;
         break;
       }
       const reason = get(`${label}-理由`);
-      scores[dk] = { score: scoreNum as 0 | 1 | 2 | 3 | 4, reason };
+      scores[dk] = { score: scoreNum as ScoreValue, reason };
     }
     if (scoreError) continue;
 
@@ -306,10 +304,6 @@ export function importFromCsv(text: string): {
         escalationTrigger = escalationStr as EscalationTrigger;
       }
     }
-
-    // 解析置信度
-    const confidenceStr = get("置信度") as Confidence;
-    const confidence: Confidence = VALID_CONFIDENCES.includes(confidenceStr) ? confidenceStr : "中";
 
     // 解析等级
     const gradeStr = get("等级") as Grade;
@@ -358,7 +352,6 @@ export function importFromCsv(text: string): {
       competitiveEvidence: get("竞品证据"),
       escalationTrigger,
       scores,
-      confidence,
       valueScore,
       grade,
       modelVersion: get("模型版本"),

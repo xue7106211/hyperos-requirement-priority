@@ -1,21 +1,40 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { RequirementForm } from "@/components/RequirementForm";
-import { DEFAULT_CONFIG } from "@/domain/modelConfig";
+import { DEFAULT_CONFIG, DIMENSION_META } from "@/domain/modelConfig";
+import { DIMENSION_KEYS } from "@/domain/types";
 import type { Requirement } from "@/domain/types";
 
+/** 把六个维度都点到各自的最高档 */
+function selectMaxForAllDimensions() {
+  const groups = screen.getAllByRole("radiogroup", { name: "评分档位" });
+  expect(groups).toHaveLength(6);
+  groups.forEach((group) => {
+    const radios = within(group).getAllByRole("radio");
+    fireEvent.click(radios[radios.length - 1]);
+  });
+}
+
 describe("RequirementForm", () => {
-  it("修改维度分后实时面板分数更新", async () => {
+  it("各维打满后实时面板显示 100.0 与 S 级", async () => {
     render(<RequirementForm initial={undefined} config={DEFAULT_CONFIG} onSave={()=>{}} />);
-    // 六维全给 4（各维找到 ScoreSelector 的 "4" 按钮点击）
-    screen.getAllByRole("radio", { name: /^4：/ }).forEach((btn) => fireEvent.click(btn));
-    // With all dimensions at 4 and default weights summing to 100,
-    // valueScore = 100. LiveResultPanel renders it as "100.0" via .toFixed(1)
+    selectMaxForAllDimensions();
+    // 各维按自身满分归一，打满合计 = 权重合计 = 100
     expect(screen.getByText("100.0")).toBeInTheDocument();
     await waitFor(() => {
       expect(screen.getByText("S")).toBeInTheDocument();
     });
   });
+
+  it("设备与生态赋能只提供 4 个档位，其余维度 5 个", () => {
+    render(<RequirementForm initial={undefined} config={DEFAULT_CONFIG} onSave={()=>{}} />);
+    const groups = screen.getAllByRole("radiogroup", { name: "评分档位" });
+    DIMENSION_KEYS.forEach((key, i) => {
+      const radios = within(groups[i]).getAllByRole("radio");
+      expect(radios).toHaveLength(DIMENSION_META[key].maxScore + 1);
+    });
+  });
+
   it("选择直升条件后六维区禁用且面板显示直升", async () => {
     render(<RequirementForm initial={undefined} config={DEFAULT_CONFIG} onSave={()=>{}} />);
     fireEvent.click(screen.getByLabelText(/法律/));
@@ -23,24 +42,26 @@ describe("RequirementForm", () => {
       expect(screen.getByText(/直升/)).toBeInTheDocument();
     });
   });
-  it("展示维度判断说明，便于对照打分", () => {
+
+  it("展示维度判断说明与按维度满分的档位标准入口", () => {
     render(<RequirementForm initial={undefined} config={DEFAULT_CONFIG} onSave={() => {}} />);
     expect(
-      screen.getByText(/判断需求是否承接 HyperOS 战略/)
+      screen.getByText(/判断需求是否承接 HyperOS 的美学战略方向/)
     ).toBeInTheDocument();
-    expect(screen.getAllByText("查看 0–4 分标准")).toHaveLength(6);
+    expect(screen.getAllByText("查看 0–4 分标准")).toHaveLength(5);
+    expect(screen.getAllByText("查看 0–3 分标准")).toHaveLength(1);
   });
-  it("默认置信度为「中」且面板显示该值", () => {
+
+  it("不再提供置信度输入", () => {
     render(<RequirementForm initial={undefined} config={DEFAULT_CONFIG} onSave={() => {}} />);
-    const display = screen.getByTestId("confidence-display");
-    expect(display).toHaveTextContent("中");
+    expect(screen.queryByText("置信度")).not.toBeInTheDocument();
   });
-  it("传入 initial.confidence=高 时面板显示「高」且保存包含该值", async () => {
+
+  it("保存时写入 v2.1 模型版本与权重阈值快照", async () => {
     const onSave = vi.fn();
-    // 构造一个 confidence="高" 的 initial,含评分理由以避免 warning dialog
     const initial: Requirement = {
       id: "test-id",
-      name: "置信度测试",
+      name: "保存测试",
       description: "",
       problemStatement: "",
       mainCategory: "体验优化",
@@ -62,26 +83,25 @@ describe("RequirementForm", () => {
         deviceEnable: { score: 2, reason: "r" },
         competitive: { score: 2, reason: "r" },
       },
-      confidence: "高",
       valueScore: 50,
       grade: "B",
-      modelVersion: "v1",
+      modelVersion: "HyperOS Requirement Value Model v2.0",
       weightsSnapshot: DEFAULT_CONFIG.weights,
       thresholdsSnapshot: DEFAULT_CONFIG.thresholds,
       evaluatedAt: "2026-01-01T00:00:00Z",
     };
     render(<RequirementForm initial={initial} config={DEFAULT_CONFIG} onSave={onSave} />);
 
-    // 面板显示置信度=高
-    expect(screen.getByTestId("confidence-display")).toHaveTextContent("高");
-
-    // 保存
     fireEvent.click(screen.getByText("保存评估"));
 
     await waitFor(() => {
       expect(onSave).toHaveBeenCalledTimes(1);
     });
     const savedReq = onSave.mock.calls[0][0];
-    expect(savedReq.confidence).toBe("高");
+    expect(savedReq.modelVersion).toBe("HyperOS Requirement Value Model v2.1");
+    expect(savedReq.weightsSnapshot).toEqual(DEFAULT_CONFIG.weights);
+    expect(savedReq.confidence).toBeUndefined();
+    // 设备维 2 分在四档下贡献 8.0，总分高于旧五档的 6.0
+    expect(savedReq.valueScore).toBe(52.0);
   });
 });

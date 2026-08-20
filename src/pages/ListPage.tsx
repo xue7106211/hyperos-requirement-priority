@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import type { DimensionKey, Requirement } from "@/domain/types";
+import type { DimensionKey, Requirement, ScoreValue } from "@/domain/types";
 import { loadRequirements, saveRequirements, loadConfig } from "@/store/storage";
 import { evaluate } from "@/domain/evaluate";
 import { exportToCsv } from "@/domain/csv";
@@ -23,7 +23,6 @@ function applyFilters(reqs: Requirement[], filters: Filters): Requirement[] {
     if (filters.keyword && !req.name.includes(filters.keyword)) return false;
     if (filters.mainCategory && req.mainCategory !== filters.mainCategory) return false;
     if (filters.grade && req.grade !== filters.grade) return false;
-    if (filters.confidence && req.confidence !== filters.confidence) return false;
     if (filters.tag && !req.tags?.includes(filters.tag)) return false;
     return true;
   });
@@ -59,7 +58,7 @@ export function ListPage({ onEditRequirement, onCreateNew }: ListPageProps) {
 
   /* ─── 批量赋值 ─── */
   const handleBulkApply = useCallback(
-    (dim: DimensionKey, score: 0 | 1 | 2 | 3 | 4) => {
+    (dim: DimensionKey, score: ScoreValue) => {
       const config = loadConfig();
       const now = new Date().toISOString();
       const all = loadRequirements();
@@ -205,7 +204,7 @@ export function ListPage({ onEditRequirement, onCreateNew }: ListPageProps) {
             还没有评估记录
           </h3>
           <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground text-pretty">
-            从单条打分开始评估，或导入已有 CSV。清单会按等级、价值分和置信度排序。
+            从单条打分开始评估，或导入已有 CSV。清单会按等级、价值分和评估时间排序。
           </p>
           <div className="mt-7 flex items-center gap-2">
             <Button size="sm" onClick={onCreateNew}>

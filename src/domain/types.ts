@@ -8,13 +8,19 @@ export const DIMENSION_KEYS: DimensionKey[] = [
   'strategy', 'userProblem', 'systemImpact', 'leverage', 'deviceEnable', 'competitive',
 ];
 
-export interface DimensionScore { score: 0 | 1 | 2 | 3 | 4; reason: string; }
+/**
+ * 档位取值。各维度满分不同（见 DIMENSION_META[key].maxScore）：
+ * 多数维度 0–4，设备与生态赋能为 0–3。
+ * 这里保留 0–4 联合类型作为取值上界，实际上界由 maxScore 在校验和 UI 中收紧。
+ */
+export type ScoreValue = 0 | 1 | 2 | 3 | 4;
+
+export interface DimensionScore { score: ScoreValue; reason: string; }
 
 export type EscalationTrigger =
   | 'legal' | 'redOrange' | 'blockDevice' | 'hardwareSell' | 'yellow' | null;
 
 export type Grade = 'S' | 'A' | 'B' | 'C';
-export type Confidence = '高' | '中' | '低';
 
 export type Weights = Record<DimensionKey, number>;
 export interface Thresholds { S: number; A: number; B: number; }
@@ -37,7 +43,6 @@ export interface Requirement {
   competitiveEvidence: string;
   escalationTrigger: EscalationTrigger;
   scores: Record<DimensionKey, DimensionScore>;
-  confidence: Confidence;
   valueScore: number | null;
   grade: Grade;
   modelVersion: string;

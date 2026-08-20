@@ -1,7 +1,8 @@
 import { DIMENSION_KEYS, type DimensionKey, type DimensionScore } from "@/domain/types";
+import { DIMENSION_META } from "@/domain/modelConfig";
 
 const SHORT_LABEL: Record<DimensionKey, string> = {
-  strategy: "战略",
+  strategy: "美学",
   userProblem: "用户",
   systemImpact: "系统",
   leverage: "杠杆",
@@ -13,7 +14,6 @@ const SIZE = 220;
 const CX = 110;
 const CY = 110;
 const RADIUS = 72;
-const MAX_SCORE = 4;
 const RING_COUNT = 4;
 
 function vertex(index: number, ratio: number) {
@@ -38,7 +38,10 @@ interface DimensionRadarProps {
 export function DimensionRadar({ scores }: DimensionRadarProps) {
   const shape = DIMENSION_KEYS.map((key, i) => {
     const value = scores[key]?.score ?? 0;
-    const { x, y } = vertex(i, value / MAX_SCORE);
+    // 各维度满分不同（设备与生态赋能为 3），按自身满分归一后再取顶点，
+    // 保证「该维打满」在雷达上一致落到最外圈。
+    const ratio = Math.min(Math.max(value / DIMENSION_META[key].maxScore, 0), 1);
+    const { x, y } = vertex(i, ratio);
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(" ");
 

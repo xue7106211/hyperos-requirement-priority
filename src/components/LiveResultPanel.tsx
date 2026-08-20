@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import type { DimensionKey, Weights, EscalationTrigger, DimensionScore, Confidence } from "@/domain/types";
+import type { DimensionKey, Weights, EscalationTrigger, DimensionScore } from "@/domain/types";
 import { DIMENSION_KEYS } from "@/domain/types";
 import { DIMENSION_META, ESCALATION_META } from "@/domain/modelConfig";
 import type { EvaluationResult } from "@/domain/evaluate";
@@ -11,7 +11,6 @@ interface LiveResultPanelProps {
   scores: Record<DimensionKey, DimensionScore>;
   weights: Weights;
   escalationTrigger: EscalationTrigger;
-  confidence: Confidence;
 }
 
 export function LiveResultPanel({
@@ -19,7 +18,6 @@ export function LiveResultPanel({
   scores,
   weights: _weights,
   escalationTrigger,
-  confidence,
 }: LiveResultPanelProps) {
   const reduceMotion = useReducedMotion();
   const fade = {
@@ -34,7 +32,7 @@ export function LiveResultPanel({
   const contributions = DIMENSION_KEYS.map((key) => {
     const dimScore = scores[key]?.score ?? 0;
     const normalizedWeight = totalWeight > 0 ? result.weightsSnapshot[key] / totalWeight : 0;
-    const contribution = (dimScore / 4) * normalizedWeight * 100;
+    const contribution = (dimScore / DIMENSION_META[key].maxScore) * normalizedWeight * 100;
     return {
       key,
       label: DIMENSION_META[key].label,
@@ -108,15 +106,6 @@ export function LiveResultPanel({
           <p className="text-xs text-muted-foreground">已按比例归一化</p>
         </div>
       )}
-
-      <div className="mt-5 border-t border-border/80 pt-3">
-        <p className="text-xs tracking-wide text-muted-foreground">
-          置信度{" "}
-          <span data-testid="confidence-display" className="font-medium text-foreground">
-            {confidence}
-          </span>
-        </p>
-      </div>
     </aside>
     </div>
   );

@@ -1,6 +1,8 @@
-# HyperOS 设计系统需求价值分级标准 v2.0（草案）
+# HyperOS 设计系统需求价值分级标准 v2.0（历史存档）
 
-> 状态：**草案**，等待评审确认。网站一期已按本文档实现（见 `src/domain/` 与 `docs/index.md`）。确认后此文档取代 v1.0 成为网站数据模型的唯一依据；v1.0（`requirement-value-model-v1.md`）保留不动，仅作历史版本存档。
+> 状态：**历史存档，已被 v2.1 取代**。当前标准为 [`requirement-value-model-v2.1.md`](./requirement-value-model-v2.1.md)，不要以本文档作为新评估或新代码的依据。
+>
+> 本文档保留不动，用于解读 `modelVersion` 为 `HyperOS Requirement Value Model v2.0` 的历史评估记录。v2.0 → v2.1 的变化见 v2.1 文档第 14 节。
 >
 > 相对 v1.0 的主要变化见第 13 节「版本变更说明」。
 

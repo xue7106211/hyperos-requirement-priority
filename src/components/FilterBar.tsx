@@ -1,4 +1,4 @@
-import type { Grade, MainCategory, Confidence } from "@/domain/types";
+import type { Grade, MainCategory } from "@/domain/types";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -12,7 +12,6 @@ export interface Filters {
   keyword: string;
   mainCategory: MainCategory | "";
   grade: Grade | "";
-  confidence: Confidence | "";
   tag: string;
 }
 
@@ -20,7 +19,6 @@ export const EMPTY_FILTERS: Filters = {
   keyword: "",
   mainCategory: "",
   grade: "",
-  confidence: "",
   tag: "",
 };
 
@@ -74,21 +72,6 @@ export function FilterBar({ filters, onChange, availableTags = [] }: FilterBarPr
           <SelectItem value="A">A</SelectItem>
           <SelectItem value="B">B</SelectItem>
           <SelectItem value="C">C</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Select
-        value={filters.confidence || "__all__"}
-        onValueChange={(v) => update({ confidence: v === "__all__" ? "" : v as Confidence })}
-      >
-        <SelectTrigger className="w-24" aria-label="置信度">
-          <SelectValue placeholder="置信度" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="__all__">全部</SelectItem>
-          <SelectItem value="高">高</SelectItem>
-          <SelectItem value="中">中</SelectItem>
-          <SelectItem value="低">低</SelectItem>
         </SelectContent>
       </Select>
 

@@ -2,6 +2,14 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { LiveResultPanel } from "@/components/LiveResultPanel";
 import { DEFAULT_WEIGHTS } from "@/domain/modelConfig";
+import { DIMENSION_KEYS } from "@/domain/types";
+import type { DimensionKey, DimensionScore } from "@/domain/types";
+
+function zeroScores(): Record<DimensionKey, DimensionScore> {
+  const out = {} as Record<DimensionKey, DimensionScore>;
+  for (const k of DIMENSION_KEYS) out[k] = { score: 0, reason: "" };
+  return out;
+}
 
 describe("LiveResultPanel", () => {
   it("普通评估显示分数与等级", () => {
@@ -14,10 +22,9 @@ describe("LiveResultPanel", () => {
           thresholdsSnapshot: { S: 85, A: 70, B: 50 },
           wasNormalized: false,
         }}
-        scores={{} as any}
+        scores={zeroScores()}
         weights={DEFAULT_WEIGHTS}
         escalationTrigger={null}
-        confidence="中"
       />
     );
     expect(screen.getByText("78.5")).toBeInTheDocument();
@@ -35,10 +42,9 @@ describe("LiveResultPanel", () => {
           thresholdsSnapshot: { S: 85, A: 70, B: 50 },
           wasNormalized: false,
         }}
-        scores={{} as any}
+        scores={zeroScores()}
         weights={DEFAULT_WEIGHTS}
         escalationTrigger={"legal"}
-        confidence="中"
       />
     );
     expect(screen.getByText(/直升 ·/)).toBeInTheDocument();
@@ -55,10 +61,9 @@ describe("LiveResultPanel", () => {
           thresholdsSnapshot: { S: 85, A: 70, B: 50 },
           wasNormalized: true,
         }}
-        scores={{} as any}
+        scores={zeroScores()}
         weights={DEFAULT_WEIGHTS}
         escalationTrigger={null}
-        confidence="中"
       />
     );
     expect(screen.getByText(/已按比例归一化/)).toBeInTheDocument();
@@ -74,16 +79,15 @@ describe("LiveResultPanel", () => {
           thresholdsSnapshot: { S: 85, A: 70, B: 50 },
           wasNormalized: false,
         }}
-        scores={{} as any}
+        scores={zeroScores()}
         weights={DEFAULT_WEIGHTS}
         escalationTrigger={null}
-        confidence="中"
       />
     );
     expect(screen.queryByText(/已按比例归一化/)).not.toBeInTheDocument();
   });
 
-  it("显示传入的置信度值", () => {
+  it("不再展示置信度", () => {
     render(
       <LiveResultPanel
         result={{
@@ -93,13 +97,32 @@ describe("LiveResultPanel", () => {
           thresholdsSnapshot: { S: 85, A: 70, B: 50 },
           wasNormalized: false,
         }}
-        scores={{} as any}
+        scores={zeroScores()}
         weights={DEFAULT_WEIGHTS}
         escalationTrigger={null}
-        confidence="高"
       />
     );
-    const display = screen.getByTestId("confidence-display");
-    expect(display).toHaveTextContent("高");
+    expect(screen.queryByText(/置信度/)).not.toBeInTheDocument();
+  });
+
+  it("设备与生态赋能按四档计贡献：1 分为 4.0", () => {
+    const scores = zeroScores();
+    scores.deviceEnable = { score: 1, reason: "" };
+    render(
+      <LiveResultPanel
+        result={{
+          valueScore: 4.0,
+          grade: "C",
+          weightsSnapshot: DEFAULT_WEIGHTS,
+          thresholdsSnapshot: { S: 85, A: 70, B: 50 },
+          wasNormalized: false,
+        }}
+        scores={scores}
+        weights={DEFAULT_WEIGHTS}
+        escalationTrigger={null}
+      />
+    );
+    // 各维贡献列表中设备维一行显示 4.0
+    expect(screen.getByText("设备与生态赋能").parentElement).toHaveTextContent("4.0");
   });
 });

@@ -1,3 +1,4 @@
+import type { ScoreValue } from "@/domain/types";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -6,16 +7,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-type ScoreValue = 0 | 1 | 2 | 3 | 4;
-
 interface ScoreSelectorProps {
   value: ScoreValue;
   onChange: (v: ScoreValue) => void;
+  /** 该维度的档位锚点，长度决定档位数（0 到 anchors.length - 1） */
   anchors: string[];
 }
 
 export function ScoreSelector({ value, onChange, anchors }: ScoreSelectorProps) {
-  const scores: ScoreValue[] = [0, 1, 2, 3, 4];
+  const scores = anchors.map((_, i) => i as ScoreValue);
 
   return (
     <TooltipProvider delayDuration={200}>
